@@ -1,16 +1,14 @@
 package ir.flyap.music_a.di
 
 import android.content.Context
-import androidx.annotation.OptIn
-import androidx.media3.common.AudioAttributes
-import androidx.media3.common.C
-import androidx.media3.common.util.UnstableApi
-import androidx.media3.database.StandaloneDatabaseProvider
-import androidx.media3.datasource.DefaultDataSource
-import androidx.media3.datasource.cache.CacheDataSource
-import androidx.media3.datasource.cache.NoOpCacheEvictor
-import androidx.media3.datasource.cache.SimpleCache
-import androidx.media3.exoplayer.ExoPlayer
+import com.google.android.exoplayer2.C
+import com.google.android.exoplayer2.ExoPlayer
+import com.google.android.exoplayer2.audio.AudioAttributes
+import com.google.android.exoplayer2.database.StandaloneDatabaseProvider
+import com.google.android.exoplayer2.upstream.DefaultDataSource
+import com.google.android.exoplayer2.upstream.cache.CacheDataSource
+import com.google.android.exoplayer2.upstream.cache.NoOpCacheEvictor
+import com.google.android.exoplayer2.upstream.cache.SimpleCache
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -22,7 +20,6 @@ import java.io.File
 @Module
 @InstallIn(ServiceComponent::class)
 object ServiceModule {
-
     @Provides
     @ServiceScoped
     fun provideAudioAttributes(): AudioAttributes =
@@ -31,14 +28,14 @@ object ServiceModule {
             .setUsage(C.USAGE_MEDIA)
             .build()
 
+
     @Provides
     @ServiceScoped
     fun provideExoPlayer(
         @ApplicationContext context: Context,
         audioAttributes: AudioAttributes
     ): ExoPlayer = ExoPlayer.Builder(context)
-        .build()
-        .apply {
+        .build().apply {
             setAudioAttributes(audioAttributes, true)
             setHandleAudioBecomingNoisy(true)
         }
@@ -49,7 +46,7 @@ object ServiceModule {
         @ApplicationContext context: Context
     ) = DefaultDataSource.Factory(context)
 
-    @OptIn(UnstableApi::class) @Provides
+    @Provides
     @ServiceScoped
     fun provideCacheDataSourceFactory(
         @ApplicationContext context: Context,

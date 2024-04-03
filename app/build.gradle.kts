@@ -82,10 +82,10 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
 
     //media
-    implementation("androidx.media3:media3-exoplayer:1.2.1")
-    implementation("androidx.media3:media3-ui:1.2.1")
-    //implementation("androidx.media:media:1.6.0")
-    //implementation ("com.google.android.exoplayer:exoplayer:2.19.1")
-    //implementation ("com.google.android.exoplayer:extension-mediasession:2.19.1")
+    //implementation("androidx.media3:media3-exoplayer:1.2.1")
+    //implementation("androidx.media3:media3-ui:1.2.1")
+    implementation("androidx.media:media:1.6.0")
+    implementation("com.google.android.exoplayer:exoplayer:2.19.1")
+    implementation("com.google.android.exoplayer:extension-mediasession:2.19.1")
 
 }

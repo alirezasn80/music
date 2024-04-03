@@ -7,6 +7,7 @@ import androidx.core.view.WindowCompat
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import dagger.hilt.android.AndroidEntryPoint
+import ir.flyap.music_a.feature.home.HomeScreen
 import ir.flyap.music_a.feature.splash.SplashScreen
 import ir.flyap.music_a.main.navigation.Screen
 import ir.flyap.music_a.main.navigation.rememberNavigationState
@@ -33,7 +34,7 @@ class MainActivity : ComponentActivity() {
                     }
 
                     composable(Screen.Home.route) {
-
+                        HomeScreen(navigationState = navigationState)
                     }
 
                 }

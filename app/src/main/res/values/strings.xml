@@ -6,4 +6,16 @@
     <string name="network_data_null">داده ای از سرور دریافت نشد</string>
     <string name="timeout">درخواست، بیش از اندازه طول کشیده است. لطفا مجددا تلاش کنید</string>
     <string name="data_is_not_exist">داده ای وجود ندارد</string>
+
+    <!-- Notificaiton Channel -->
+    <string name="notification_channel">Now Playing</string>
+    <string name="notification_channel_description">Shows what music is currently playing in our App</string>
+    <!-- Notification actions -->
+    <string name="notification_skip_to_previous">Skip to previous track</string>
+    <string name="notification_skip_to_next">Skip to next track</string>
+    <string name="notification_play">Play</string>
+    <string name="notification_pause">Pause</string>
+    <!-- Error messages -->
+    <string name="error_media_not_found">Could not locate requested media.</string>
+    <string name="generic_error">The application has encountered an unexpected error.</string>
 </resources>
