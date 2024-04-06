@@ -18,4 +18,8 @@
     <!-- Error messages -->
     <string name="error_media_not_found">Could not locate requested media.</string>
     <string name="generic_error">The application has encountered an unexpected error.</string>
+    <string name="album">آلبوم</string>
+    <string name="play_all">پخش همه</string>
+    <string name="cover">کاور</string>
+    <string name="lyrics">متن</string>
 </resources>

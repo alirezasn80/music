@@ -35,4 +35,6 @@ sealed class Screen(val route: String) {
     data object Content : Screen("Content/{${Arg.CATEGORY_ID}}/{${Arg.CONTENT_ID}}")
 
     data object Home : Screen("Home")
+
+    data object Detail : Screen("Detail")
 }

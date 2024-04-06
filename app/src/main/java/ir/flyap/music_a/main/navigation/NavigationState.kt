@@ -35,6 +35,8 @@ class NavigationState(
 
     fun navToAboutUs() = navController.navigate(Screen.AboutUs.route)
 
+    fun navToDetail() = navController.navigate(Screen.Detail.route)
+
     fun navToPayment(key: String) = navController.navigate(Screen.Payment.route(key))
 
     fun navToStories(categoryId: Int, title: String) = navController.navigate(Screen.Stories.route(categoryId, title))

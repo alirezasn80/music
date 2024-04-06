@@ -18,24 +18,24 @@ import androidx.core.view.WindowCompat
 
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Color(0xff5ea3de),
+    primary = Color(0xFF88B0D3),
     secondary = BlueGrayDrawer,
     background = BlueGrayBackground,
     onBackground = PurpleOnBackground,
     onPrimary = Color.White,
     onSecondary = Color.White,
-    surface = Color(0xff222e3a),
+    surface = Color(0xFF295077),
     onSurface = PurpleOnBackground
 )
 
 private val LightColorScheme = lightColorScheme(
     primary = OrangeTopBar,
     secondary = OrangeDrawer,
-    background = Color(0xfffbfbfb),
+    background = Color(0xFFF5FCF1),
     onBackground = BlackOnBackground,
     onPrimary = Color.White,
     onSecondary = Color.White,
-    surface = Color.White,
+    surface = Color(0xFFE4FFD5),
     onSurface = BlackOnBackground
 )
 
@@ -47,7 +47,8 @@ fun MusicTheme(
     dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
-    val colorScheme = when {
+    val colorScheme = LightColorScheme
+        /*when {
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
             val context = LocalContext.current
             if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
@@ -55,7 +56,7 @@ fun MusicTheme(
 
         darkTheme -> DarkColorScheme
         else -> LightColorScheme
-    }
+    }*/
     val view = LocalView.current
     if (!view.isInEditMode) {
         SideEffect {

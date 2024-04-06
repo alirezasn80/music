@@ -16,6 +16,7 @@ import ir.flyap.music_a.repository.AudioRepository
 import ir.flyap.music_a.service.MediaPlayerService
 import ir.flyap.music_a.utill.BaseViewModel
 import ir.flyap.music_a.utill.debug
+import ir.flyap.music_a.utill.timeStampToDuration
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.update
@@ -55,13 +56,24 @@ class HomeViewModel @Inject constructor(
 
     val isPlaying: Boolean get() = playbackState.value?.isPlaying == true
 
-    private val currentDuration: Long get() = MediaPlayerService.currentDuration
+    val currentDuration: Long get() = MediaPlayerService.currentDuration
+
 
 
     init {
+        //temp()
         initMediaPlayerServiceConnectionListener()
         getAudios()
         updateSubscribe()
+    }
+
+    private fun temp() {
+        viewModelScope.launch (Dispatchers.IO){
+            while (true){
+                delay(1000)
+            //   debug("current : ${timeStampToDuration(currentDuration)}")
+            }
+        }
     }
 
     //what is it? -> playlist,favorites,...
@@ -143,6 +155,10 @@ class HomeViewModel @Inject constructor(
         serviceConnection.skipToNext()
     }
 
+    fun skipToPrevious() {
+        serviceConnection.skipToPrevious()
+    }
+
     // manually move slider
     fun seekTo(value: Float) {
         serviceConnection.transportControl.seekTo(
@@ -160,6 +176,7 @@ class HomeViewModel @Inject constructor(
             }
 
             if (currentDuration > 0) {
+                state.update { it.copy(currentDuration = currentPlayBackPosition) }
                 val currentProgress = (currentPlayBackPosition.toFloat() / currentDuration.toFloat() * 100f)
                 state.update { it.copy(currentProgress = currentProgress) }
             }
@@ -183,5 +200,9 @@ class HomeViewModel @Inject constructor(
             object : MediaBrowserCompat.SubscriptionCallback() {}
         )
         updatePosition = false
+    }
+
+    fun onAlbumClick(album: String) {
+
     }
 }

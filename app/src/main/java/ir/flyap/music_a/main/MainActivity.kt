@@ -4,10 +4,13 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.core.view.WindowCompat
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import dagger.hilt.android.AndroidEntryPoint
+import ir.flyap.music_a.feature.detail.DetailScreen
 import ir.flyap.music_a.feature.home.HomeScreen
+import ir.flyap.music_a.feature.home.HomeViewModel
 import ir.flyap.music_a.feature.splash.SplashScreen
 import ir.flyap.music_a.main.navigation.Screen
 import ir.flyap.music_a.main.navigation.rememberNavigationState
@@ -22,6 +25,8 @@ class MainActivity : ComponentActivity() {
         LocaleUtils.updateResources(this)
         setContent {
             val navigationState = rememberNavigationState()
+            val mediaViewModel: HomeViewModel = hiltViewModel()
+
 
             MusicTheme {
                 NavHost(
@@ -34,7 +39,17 @@ class MainActivity : ComponentActivity() {
                     }
 
                     composable(Screen.Home.route) {
-                        HomeScreen(navigationState = navigationState)
+                        HomeScreen(
+                            navigationState = navigationState,
+                            viewModel = mediaViewModel
+                        )
+                    }
+
+                    composable(Screen.Detail.route) {
+                        DetailScreen(
+                            navigationState = navigationState,
+                            viewModel = mediaViewModel
+                        )
                     }
 
                 }
