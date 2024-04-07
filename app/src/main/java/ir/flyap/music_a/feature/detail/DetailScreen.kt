@@ -8,11 +8,15 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowForward
 import androidx.compose.material3.Icon
@@ -34,6 +38,7 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -47,6 +52,7 @@ import ir.flyap.music_a.ui.theme.LargeSpacer
 import ir.flyap.music_a.ui.theme.MediumSpacer
 import ir.flyap.music_a.ui.theme.SmallSpacer
 import ir.flyap.music_a.ui.theme.dimension
+import ir.flyap.music_a.utill.createImageBitmap
 import ir.flyap.music_a.utill.timeStampToDuration
 
 @Composable
@@ -56,12 +62,13 @@ fun DetailScreen(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     var selectedFrame by remember { mutableStateOf("cover") }
+    val context = LocalContext.current
 
     if (state.currentAudio != null)
         Scaffold(
             topBar = {
                 Header(
-                    title = state.currentAudio!!.title,
+                    title = state.currentAudio!!.displayName,
                     upPress = navigationState::upPress,
                     selectedFrame = selectedFrame,
                     onItemClick = { selectedFrame = it }
@@ -87,15 +94,43 @@ fun DetailScreen(
                     .background(MaterialTheme.colorScheme.primary), horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 SmallSpacer()
-                Image(
-                    painter = painterResource(id = R.drawable.ic_launcher_background),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .padding(vertical = dimension.medium)
-                        .clip(MaterialTheme.shapes.small)
-                        .fillMaxWidth(0.9f),
-                    contentScale = ContentScale.Crop
-                )
+                if (selectedFrame == "cover") {
+                    if (state.currentAudio?.imagePath != null)
+                        Image(
+                            bitmap = createImageBitmap(context, state.currentAudio!!.imagePath!!),
+                            contentDescription = null,
+                            modifier = Modifier
+                                .padding(vertical = dimension.medium)
+                                .clip(MaterialTheme.shapes.small)
+                                .fillMaxWidth(0.9f)
+                                .aspectRatio(1f),
+                            contentScale = ContentScale.Crop
+                        ) else
+                        Image(
+                            painter = painterResource(id = R.drawable.ic_launcher_background),
+                            contentDescription = null,
+                            modifier = Modifier
+                                .padding(vertical = dimension.medium)
+                                .clip(MaterialTheme.shapes.small)
+                                .fillMaxWidth(0.9f)
+                                .aspectRatio(1f),
+                            contentScale = ContentScale.Crop
+                        )
+                } else {
+                    Column(
+                        modifier = Modifier
+                            .padding(vertical = dimension.medium)
+                            .clip(MaterialTheme.shapes.small)
+                            .background(MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f))
+                            .padding(dimension.small)
+                            .fillMaxWidth(0.9f)
+                            .aspectRatio(1f)
+                            .verticalScroll(rememberScrollState()),
+                    ) {
+                        Text(text = state.currentAudio!!.lyrics ?: "متنی وجود ندارد!")
+                    }
+
+                }
 
 
             }

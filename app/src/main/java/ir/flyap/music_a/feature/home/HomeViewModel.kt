@@ -6,6 +6,8 @@ import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import ir.flyap.music_a.db.AppDB
+import ir.flyap.music_a.db.entity.MusicEntity
 import ir.flyap.music_a.media.K
 import ir.flyap.music_a.media.MediaPlayerServiceConnection
 import ir.flyap.music_a.media.MediaPlayerServiceConnectionListener
@@ -26,7 +28,8 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val repository: AudioRepository,
-    serviceConnection: MediaPlayerServiceConnection
+    serviceConnection: MediaPlayerServiceConnection,
+    private val db: AppDB,
 ) : BaseViewModel<HomeState>(HomeState()) {
 
     //-----------------------------------------------------------------------------------
@@ -59,22 +62,12 @@ class HomeViewModel @Inject constructor(
     val currentDuration: Long get() = MediaPlayerService.currentDuration
 
 
-
     init {
-        //temp()
         initMediaPlayerServiceConnectionListener()
         getAudios()
         updateSubscribe()
     }
 
-    private fun temp() {
-        viewModelScope.launch (Dispatchers.IO){
-            while (true){
-                delay(1000)
-            //   debug("current : ${timeStampToDuration(currentDuration)}")
-            }
-        }
-    }
 
     //what is it? -> playlist,favorites,...
     private fun updateSubscribe() {

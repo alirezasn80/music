@@ -5,6 +5,7 @@ import android.app.Application
 import android.media.MediaMetadataRetriever
 import android.net.Uri
 import androidx.lifecycle.viewModelScope
+import ir.flyap.music_a.db.AppDB
 import ir.flyap.music_a.model.Audio
 import ir.flyap.music_a.utill.debug
 import kotlinx.coroutines.Dispatchers
@@ -17,17 +18,60 @@ import javax.inject.Singleton
 
 @Singleton
 class AudioRepository @Inject
-constructor(val context: Application) {
+constructor(
+    val context: Application,
+    private val db: AppDB,
+) {
     suspend fun getAudioData(): List<Audio> = withContext(Dispatchers.IO) {
         val path = "musics"
         val audios = mutableListOf<Audio>()
         val mmr = MediaMetadataRetriever()
         val assetManager = context.assets
         val musicFiles = assetManager.list(path)
+        val musics = db.musicDao.getMusics()
 
         try {
 
-            musicFiles?.forEach { fileName ->
+            musics.forEach { item ->
+
+                val assetFileDescriptor = assetManager.openFd(item.musicPath)
+                mmr.setDataSource(assetFileDescriptor.fileDescriptor, assetFileDescriptor.startOffset, assetFileDescriptor.length)
+
+                val uri = Uri.parse("file:///android_asset/${item.musicPath}")
+                val displayName = item.title
+                val artist = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST) ?: "Unknown Artist"
+                val duration = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION) ?: "Unknown Duration"
+                val title = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE) ?: "Unknown Title"
+                val id = item.id.toString()
+                audios.add(
+                    Audio(
+                        id = id,
+                        uri = uri,
+                        displayName = displayName,
+                        artist = artist,
+                        duration = duration.toLong(),
+                        title = title,
+                        imagePath = item.imagePath,
+                        lyrics = item.lyrics,
+                        album = item.album
+                    )
+                )
+
+            }
+        } catch (e: Exception) {
+            debug("error : ${e.message}")
+        } finally {
+            mmr.release()
+        }
+        audios
+    }
+}
+
+
+/*
+*
+*
+*    musicFiles?.forEach { fileName ->
                 val filePath = "$path/$fileName"
                 val assetFileDescriptor = assetManager.openFd(filePath)
                 mmr.setDataSource(assetFileDescriptor.fileDescriptor, assetFileDescriptor.startOffset, assetFileDescriptor.length)
@@ -50,11 +94,6 @@ constructor(val context: Application) {
                 )
 
             }
-        } catch (e: Exception) {
-            debug("error : ${e.message}")
-        } finally {
-            mmr.release()
-        }
-        audios
-    }
-}
+*
+*
+* */

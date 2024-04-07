@@ -8,5 +8,8 @@ data class Audio(
     val displayName: String,
     val artist: String,
     val duration: Long,
-    val title: String
+    val title: String,
+    val imagePath: String? = null,
+    val lyrics: String? = null,
+    val album: String? = null,
 )

@@ -1,5 +1,6 @@
 package ir.flyap.music_a.feature.home
 
+import android.graphics.BitmapFactory
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -41,9 +42,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
@@ -57,6 +60,7 @@ import ir.flyap.music_a.model.Audio
 import ir.flyap.music_a.ui.theme.ExtraSmallSpacer
 import ir.flyap.music_a.ui.theme.SmallSpacer
 import ir.flyap.music_a.ui.theme.dimension
+import ir.flyap.music_a.utill.createImageBitmap
 import kotlinx.coroutines.launch
 
 @Composable
@@ -212,22 +216,27 @@ private fun AudioItem(
     audio: Audio,
     onItemClick: () -> Unit
 ) {
+    val context = LocalContext.current
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = dimension.small, vertical = dimension.extraSmall)
-            .background(MaterialTheme.colorScheme.surface)
+            .background(MaterialTheme.colorScheme.surface,MaterialTheme.shapes.small)
             .clickable {
                 onItemClick.invoke()
             }
             .padding(vertical = dimension.small),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Image(
-            painter = painterResource(id = R.drawable.ic_launcher_background), contentDescription = null, modifier = Modifier
-                .clip(MaterialTheme.shapes.small)
-                .size(50.dp)
-        )
+        SmallSpacer()
+        if (audio.imagePath != null)
+            Image(
+                bitmap = createImageBitmap(context, audio.imagePath),
+                contentDescription = null,
+                modifier = Modifier
+                    .clip(MaterialTheme.shapes.small)
+                    .size(50.dp)
+            )
         Column(
             modifier = Modifier
                 .weight(1f)
@@ -239,7 +248,7 @@ private fun AudioItem(
                 overflow = TextOverflow.Clip,
                 maxLines = 1
             )
-            ExtraSmallSpacer()
+            /*ExtraSmallSpacer()
             Text(
                 text = audio.artist,
                 style = MaterialTheme.typography.labelSmall,
@@ -248,7 +257,7 @@ private fun AudioItem(
                 color = MaterialTheme.colorScheme
                     .onSurface
                     .copy(alpha = .5f)
-            )
+            )*/
 
         }
 
@@ -266,7 +275,7 @@ private fun RowScope.ArtistInfo(
 
         Column {
             Text(
-                text = audio.title,
+                text = audio.displayName,
                 fontWeight = FontWeight.Bold,
                 style = MaterialTheme.typography.titleSmall,
                 overflow = TextOverflow.Clip,
@@ -274,7 +283,7 @@ private fun RowScope.ArtistInfo(
                 color = MaterialTheme.colorScheme.onSecondary
             )
 
-            Text(
+            /*Text(
                 text = audio.artist,
                 fontWeight = FontWeight.Normal,
                 style = MaterialTheme.typography.labelSmall,
@@ -282,7 +291,7 @@ private fun RowScope.ArtistInfo(
                 maxLines = 1,
                 color = MaterialTheme.colorScheme.onSecondary
 
-            )
+            )*/
 
         }
 
@@ -380,7 +389,7 @@ private fun BottomBarPlayer(
             .fillMaxWidth()
             .background(MaterialTheme.colorScheme.secondary, RoundedCornerShape(topEnd = 5.dp, topStart = 5.dp))
             .clickable { onclick() }
-            .padding(horizontal = dimension.medium, vertical = dimension.extraSmall),
+            .padding(horizontal = dimension.medium, vertical = dimension.small),
         verticalAlignment = Alignment.CenterVertically
     ) {
 
