@@ -1,5 +1,6 @@
 package ir.flyap.music_a.feature.home
 
+import SliderImage
 import android.graphics.BitmapFactory
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
@@ -68,6 +69,7 @@ fun HomeScreen(navigationState: NavigationState, viewModel: HomeViewModel) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
+    val context = LocalContext.current
 
     // Close drawer
     BackHandler(drawerState.isOpen) {
@@ -100,15 +102,17 @@ fun HomeScreen(navigationState: NavigationState, viewModel: HomeViewModel) {
                 }
             },
             topBar = {
-                Row(
+                Box(
                     Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
                 ) {
+
                     IconButton(onClick = { scope.launch { drawerState.open() } }) {
                         Icon(imageVector = ImageVector.vectorResource(R.drawable.ic_menu), contentDescription = null)
                     }
-                    SmallSpacer()
-                    Text(text = "آهنگ های مشت", style = MaterialTheme.typography.titleSmall)
+
+                    Text(
+                        text = "آهنگ های مشت", style = MaterialTheme.typography.titleSmall, modifier = Modifier.align(Alignment.Center)
+                    )
                 }
 
             }
@@ -119,6 +123,8 @@ fun HomeScreen(navigationState: NavigationState, viewModel: HomeViewModel) {
                     .fillMaxSize()
                     .padding(paddingValues)
             ) {
+                SmallSpacer()
+                SliderImage(imageList = context.assets.list("slider")!!.toList().map { createImageBitmap(context, "slider/$it") })
                 AlbumBar(viewModel::onAlbumClick)
                 SmallSpacer()
                 PlayAll(onClick = { viewModel.playAudio(state.audios[0]) })
@@ -221,7 +227,7 @@ private fun AudioItem(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = dimension.small, vertical = dimension.extraSmall)
-            .background(MaterialTheme.colorScheme.surface,MaterialTheme.shapes.small)
+            .background(MaterialTheme.colorScheme.surface, MaterialTheme.shapes.small)
             .clickable {
                 onItemClick.invoke()
             }
