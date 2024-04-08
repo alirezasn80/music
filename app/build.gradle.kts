@@ -94,4 +94,10 @@ dependencies {
     implementation("com.google.android.exoplayer:exoplayer:2.19.1")
     implementation("com.google.android.exoplayer:extension-mediasession:2.19.1")
 
+    // Tapsell
+    implementation("ir.tapsell.plus:tapsell-plus-sdk-android:2.2.4")
+
+    // Poolakey
+    implementation("com.github.cafebazaar.Poolakey:poolakey:2.2.0")
+
 }

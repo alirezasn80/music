@@ -9,6 +9,7 @@ import com.google.android.exoplayer2.source.ConcatenatingMediaSource
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.upstream.cache.CacheDataSource
 import ir.flyap.music_a.repository.AudioRepository
+import ir.flyap.music_a.utill.debug
 import javax.inject.Inject
 
 class MediaSource
@@ -38,31 +39,38 @@ class MediaSource
 
     suspend fun load() {
         state = AudioSourceState.STATE_INITIALIZING
-        val data = repository.getAudioData()
-        audioMediaMetaData = data.map { audio ->
-            MediaMetadataCompat.Builder()
-                .putString(
-                    MediaMetadataCompat.METADATA_KEY_MEDIA_ID,
-                    audio.id
-                ).putString(
-                    MediaMetadataCompat.METADATA_KEY_ALBUM_ARTIST,
-                    audio.artist
-                ).putString(
-                    MediaMetadataCompat.METADATA_KEY_MEDIA_URI,
-                    audio.uri.toString()
-                ).putString(
-                    MediaMetadataCompat.METADATA_KEY_TITLE,
-                    audio.title
-                ).putString(
-                    MediaMetadataCompat.METADATA_KEY_DISPLAY_SUBTITLE,
-                    audio.displayName
-                ).putLong(
-                    MediaMetadataCompat.METADATA_KEY_DURATION,
-                    audio.duration
-                )
-                .build()
-        }
-        state = AudioSourceState.STATE_INITIALIZED
+        repository.getAllMusic(
+            onSuccess = { data ->
+                audioMediaMetaData = data.map { audio ->
+                    MediaMetadataCompat.Builder()
+                        .putString(
+                            MediaMetadataCompat.METADATA_KEY_MEDIA_ID,
+                            audio.id
+                        ).putString(
+                            MediaMetadataCompat.METADATA_KEY_ALBUM_ARTIST,
+                            audio.artist
+                        ).putString(
+                            MediaMetadataCompat.METADATA_KEY_MEDIA_URI,
+                            audio.uri.toString()
+                        ).putString(
+                            MediaMetadataCompat.METADATA_KEY_TITLE,
+                            audio.title
+                        ).putString(
+                            MediaMetadataCompat.METADATA_KEY_DISPLAY_SUBTITLE,
+                            audio.displayName
+                        ).putLong(
+                            MediaMetadataCompat.METADATA_KEY_DURATION,
+                            audio.duration
+                        )
+                        .build()
+                }
+                state = AudioSourceState.STATE_INITIALIZED
+            },
+            onError = {
+                debug(it.message)
+            }
+        )
+
 
     }
 

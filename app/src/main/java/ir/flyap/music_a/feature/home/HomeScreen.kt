@@ -1,7 +1,6 @@
 package ir.flyap.music_a.feature.home
 
 import SliderImage
-import android.graphics.BitmapFactory
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -22,6 +21,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.AddCircle
 import androidx.compose.material.icons.rounded.PlayArrow
+import androidx.compose.material.icons.rounded.Share
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -43,7 +43,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
@@ -57,11 +56,11 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ir.flyap.music_a.R
 import ir.flyap.music_a.main.navigation.NavigationState
-import ir.flyap.music_a.model.Audio
-import ir.flyap.music_a.ui.theme.ExtraSmallSpacer
+import ir.flyap.music_a.model.Music
 import ir.flyap.music_a.ui.theme.SmallSpacer
 import ir.flyap.music_a.ui.theme.dimension
 import ir.flyap.music_a.utill.createImageBitmap
+import ir.flyap.music_a.utill.shareFile
 import kotlinx.coroutines.launch
 
 @Composable
@@ -77,7 +76,6 @@ fun HomeScreen(navigationState: NavigationState, viewModel: HomeViewModel) {
             scope.launch { drawerState.close() }
     }
 
-
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
@@ -91,9 +89,9 @@ fun HomeScreen(navigationState: NavigationState, viewModel: HomeViewModel) {
     ) {
         Scaffold(
             bottomBar = {
-                state.currentAudio?.let { currentPlayingAudio ->
+                state.currentMusic?.let { currentPlayingAudio ->
                     BottomBarPlayer(
-                        audio = currentPlayingAudio,
+                        music = currentPlayingAudio,
                         isAudioPlaying = viewModel.isPlaying,
                         onStart = { viewModel.playAudio(currentPlayingAudio) },
                         onNext = { viewModel.skipToNext() },
@@ -124,15 +122,22 @@ fun HomeScreen(navigationState: NavigationState, viewModel: HomeViewModel) {
                     .padding(paddingValues)
             ) {
                 SmallSpacer()
-                SliderImage(imageList = context.assets.list("slider")!!.toList().map { createImageBitmap(context, "slider/$it") })
-                AlbumBar(viewModel::onAlbumClick)
+                SliderImage()
+                AlbumBar(
+                    items = state.categories,
+                    onAlbumClick = viewModel::onAlbumClick
+                )
                 SmallSpacer()
-                PlayAll(onClick = { viewModel.playAudio(state.audios[0]) })
+                PlayAll(onClick = { viewModel.playAudio(state.musics[0]) })
                 LazyColumn {
-                    items(state.audios) { audio ->
-                        AudioItem(audio = audio) {
-                            viewModel.playAudio(audio)
-                        }
+                    items(state.musics) { audio ->
+                        AudioItem(
+                            music = audio,
+                            onItemClick = { viewModel.playAudio(audio) },
+                            onSaveFileClick = {}
+                        )
+
+
                     }
                 }
             }
@@ -166,39 +171,36 @@ private fun PlayAll(onClick: () -> Unit) {
 
 }
 
-private val albums = listOf(
-    "همه",
-    "مکعب",
-    "سیقل",
-    "آهو"
-)
-
 @Composable
-private fun AlbumBar(onAlbumClick: (String) -> Unit) {
-    Row(
-        Modifier
-            .padding(horizontal = dimension.medium),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(text = stringResource(id = R.string.album))
-        SmallSpacer()
-        Row(Modifier.fillMaxWidth()) {
-            var selectedAlbum by remember { mutableStateOf(albums[0]) }
-            albums.forEach {
-                AlbumChip(
-                    title = it,
-                    selectedAlbum == it,
-                    onClick = {
-                        if (selectedAlbum != it) {
-                            selectedAlbum = it
-                            onAlbumClick(it)
-                        }
+private fun AlbumBar(
+    items: List<String>,
+    onAlbumClick: (String) -> Unit
+) {
+    if (items.isNotEmpty())
+        Row(
+            Modifier
+                .padding(horizontal = dimension.medium),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(text = stringResource(id = R.string.album))
+            SmallSpacer()
+            Row(Modifier.fillMaxWidth()) {
+                var selectedAlbum by remember { mutableStateOf(items[0]) }
+                items.forEach {
+                    AlbumChip(
+                        title = it,
+                        selectedAlbum == it,
+                        onClick = {
+                            if (selectedAlbum != it) {
+                                selectedAlbum = it
+                                onAlbumClick(it)
+                            }
 
-                    }
-                )
+                        }
+                    )
+                }
             }
         }
-    }
 }
 
 @Composable
@@ -219,8 +221,9 @@ fun AlbumChip(title: String, isSelected: Boolean, onClick: () -> Unit) {
 
 @Composable
 private fun AudioItem(
-    audio: Audio,
-    onItemClick: () -> Unit
+    music: Music,
+    onItemClick: () -> Unit,
+    onSaveFileClick: () -> Unit
 ) {
     val context = LocalContext.current
     Row(
@@ -235,9 +238,17 @@ private fun AudioItem(
         verticalAlignment = Alignment.CenterVertically
     ) {
         SmallSpacer()
-        if (audio.imagePath != null)
+        if (music.imagePath != null)
             Image(
-                bitmap = createImageBitmap(context, audio.imagePath),
+                bitmap = createImageBitmap(context, music.imagePath),
+                contentDescription = null,
+                modifier = Modifier
+                    .clip(MaterialTheme.shapes.small)
+                    .size(50.dp)
+            )
+        else
+            Image(
+                painter = painterResource(id = R.drawable.ic_launcher_background),
                 contentDescription = null,
                 modifier = Modifier
                     .clip(MaterialTheme.shapes.small)
@@ -249,7 +260,7 @@ private fun AudioItem(
                 .padding(horizontal = dimension.small)
         ) {
             Text(
-                text = audio.displayName,
+                text = music.displayName,
                 style = MaterialTheme.typography.titleSmall,
                 overflow = TextOverflow.Clip,
                 maxLines = 1
@@ -266,13 +277,34 @@ private fun AudioItem(
             )*/
 
         }
+        SmallSpacer()
+        IconButton(onClick = { context.shareFile(music) }) {
+            Icon(imageVector = Icons.Rounded.Share, contentDescription = null)
+        }
+
+        /*PopUpMenu(
+            mainIcon = Icons.Rounded.MoreVert,
+            titleMenuItems = listOf("اشتراک گذاری", "ذخیره"),
+            iconMenuItems = listOf(Icons.Rounded.Share, ImageVector.vectorResource(R.drawable.ic_save))
+        ) {
+            when (it) {
+
+                0 -> {
+                    context.shareFile(audio)
+                }
+
+                1 -> {
+                    onSaveFileClick()
+                }
+            }
+        }*/
 
     }
 }
 
 @Composable
 private fun RowScope.ArtistInfo(
-    audio: Audio
+    music: Music
 ) {
     Row(
         modifier = Modifier.weight(1f),
@@ -281,7 +313,7 @@ private fun RowScope.ArtistInfo(
 
         Column {
             Text(
-                text = audio.displayName,
+                text = music.displayName,
                 fontWeight = FontWeight.Bold,
                 style = MaterialTheme.typography.titleSmall,
                 overflow = TextOverflow.Clip,
@@ -383,7 +415,7 @@ private fun MediaPlayerController(
 @Composable
 private fun BottomBarPlayer(
     onclick: () -> Unit,
-    audio: Audio,
+    music: Music,
     isAudioPlaying: Boolean,
     onStart: () -> Unit,
     onNext: () -> Unit
@@ -395,7 +427,7 @@ private fun BottomBarPlayer(
             .fillMaxWidth()
             .background(MaterialTheme.colorScheme.secondary, RoundedCornerShape(topEnd = 5.dp, topStart = 5.dp))
             .clickable { onclick() }
-            .padding(horizontal = dimension.medium, vertical = dimension.small),
+            .padding(horizontal = dimension.medium, vertical = dimension.medium),
         verticalAlignment = Alignment.CenterVertically
     ) {
 
@@ -407,7 +439,7 @@ private fun BottomBarPlayer(
 
         SmallSpacer()
 
-        ArtistInfo(audio = audio)
+        ArtistInfo(music = music)
     }
 
     /*Slider(

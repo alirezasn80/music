@@ -1,24 +1,23 @@
 package ir.flyap.music_a.feature.home
 
+import android.app.Application
 import android.support.v4.media.MediaBrowserCompat
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import ir.flyap.music_a.db.AppDB
-import ir.flyap.music_a.db.entity.MusicEntity
+import ir.flyap.music_a.R
 import ir.flyap.music_a.media.K
 import ir.flyap.music_a.media.MediaPlayerServiceConnection
 import ir.flyap.music_a.media.MediaPlayerServiceConnectionListener
 import ir.flyap.music_a.media.currentPosition
 import ir.flyap.music_a.media.isPlaying
-import ir.flyap.music_a.model.Audio
+import ir.flyap.music_a.model.Music
 import ir.flyap.music_a.repository.AudioRepository
 import ir.flyap.music_a.service.MediaPlayerService
 import ir.flyap.music_a.utill.BaseViewModel
 import ir.flyap.music_a.utill.debug
-import ir.flyap.music_a.utill.timeStampToDuration
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.update
@@ -29,7 +28,7 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(
     private val repository: AudioRepository,
     serviceConnection: MediaPlayerServiceConnection,
-    private val db: AppDB,
+    private val context: Application,
 ) : BaseViewModel<HomeState>(HomeState()) {
 
     //-----------------------------------------------------------------------------------
@@ -64,8 +63,23 @@ class HomeViewModel @Inject constructor(
 
     init {
         initMediaPlayerServiceConnectionListener()
-        getAudios()
+        getAllMusic()
+        getCategories()
         updateSubscribe()
+    }
+
+    private fun getCategories() {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.getCategories(
+                onSuccess = { items ->
+                    state.update { it.copy(categories = items) }
+                },
+                onError = {
+                    debug(it.message)
+                }
+            )
+
+        }
     }
 
 
@@ -86,10 +100,16 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    private fun getAudios() {
+    private fun getAllMusic() {
         viewModelScope.launch(Dispatchers.IO) {
-            val audios = repository.getAudioData()
-            state.update { it.copy(audios = audios) }
+            repository.getAllMusic(
+                onSuccess = { items ->
+                    state.update { it.copy(musics = items) }
+                },
+                onError = {
+                    setMessageBySnackbar(R.string.unknown_error)
+                }
+            )
         }
     }
 
@@ -97,8 +117,8 @@ class HomeViewModel @Inject constructor(
     private fun initMediaPlayerServiceConnectionListener() {
         serviceConnection.initListener(
             object : MediaPlayerServiceConnectionListener {
-                override fun onAudioChanged(audio: Audio) {
-                    state.update { it.copy(currentAudio = audio) }
+                override fun onAudioChanged(music: Music) {
+                    state.update { it.copy(currentMusic = music) }
                 }
 
             }
@@ -107,13 +127,13 @@ class HomeViewModel @Inject constructor(
     }
 
 
-    fun playAudio(audio: Audio) {
+    fun playAudio(music: Music) {
 
         // why call it?
-        serviceConnection.playAudio(state.value.audios)
-        val prevAudio = state.value.currentAudio?.id
+        serviceConnection.playAudio(state.value.musics)
+        val prevAudio = state.value.currentMusic?.id
 
-        if (audio.id == prevAudio) {
+        if (music.id == prevAudio) {
 
             if (isPlaying) {
                 serviceConnection.transportControl.pause()
@@ -122,9 +142,9 @@ class HomeViewModel @Inject constructor(
             }
 
         } else {
-            state.update { it.copy(currentAudio = audio) }
+            state.update { it.copy(currentMusic = music) }
             // todo(should change media id to uri)
-            serviceConnection.transportControl.playFromMediaId(audio.uri.toString(), null)
+            serviceConnection.transportControl.playFromMediaId(music.uri.toString(), null)
         }
 
 
@@ -196,6 +216,24 @@ class HomeViewModel @Inject constructor(
     }
 
     fun onAlbumClick(album: String) {
+        debug("album : $album")
+        if (album == "همه") {
+            getAllMusic()
+            return
+        }
+
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.getMusics(
+                album = album,
+                onSuccess = { items ->
+                    state.update { it.copy(musics = items) }
+                },
+                onError = {
+                    setMessageBySnackbar(R.string.unknown_error)
+                }
+            )
+        }
 
     }
+
 }

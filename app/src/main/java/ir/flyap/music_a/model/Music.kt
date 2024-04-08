@@ -2,9 +2,10 @@ package ir.flyap.music_a.model
 
 import android.net.Uri
 
-data class Audio(
+data class Music(
     val id: String,
     val uri: Uri,
+    val fileName:String,
     val displayName: String,
     val artist: String,
     val duration: Long,

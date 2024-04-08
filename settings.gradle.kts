@@ -16,6 +16,8 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        maven(url = "https://dl.bintray.com/tapsellorg/maven")
+        maven(url = "https://jitpack.io")
     }
 }
 

@@ -7,14 +7,14 @@ import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaControllerCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import dagger.hilt.android.qualifiers.ApplicationContext
-import ir.flyap.music_a.model.Audio
+import ir.flyap.music_a.model.Music
 import ir.flyap.music_a.service.MediaPlayerService
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
 
 interface MediaPlayerServiceConnectionListener {
-    fun onAudioChanged(audio: Audio)
+    fun onAudioChanged(music: Music)
 }
 
 class MediaPlayerServiceConnection @Inject constructor(
@@ -50,7 +50,7 @@ class MediaPlayerServiceConnection @Inject constructor(
     ).apply {
         connect()
     }
-    private var audioList = listOf<Audio>()
+    private var musicList = listOf<Music>()
 
     val rootMediaId: String
         get() = mediaBrowser.root
@@ -59,8 +59,8 @@ class MediaPlayerServiceConnection @Inject constructor(
         get() = mediaControllerCompat.transportControls
 
 
-    fun playAudio(audios: List<Audio>) {
-        audioList = audios
+    fun playAudio(music: List<Music>) {
+        musicList = music
         mediaBrowser.sendCustomAction(K.START_MEDIA_PLAY_ACTION, null, null)
     }
 
@@ -140,7 +140,7 @@ class MediaPlayerServiceConnection @Inject constructor(
             super.onMetadataChanged(metadata)
 
             metadata?.let { data ->
-                val currentAudio = audioList.find { it.uri == data.description.mediaUri }
+                val currentAudio = musicList.find { it.uri == data.description.mediaUri }
                 currentAudio?.let { _listener.onAudioChanged(it) }
             }
         }

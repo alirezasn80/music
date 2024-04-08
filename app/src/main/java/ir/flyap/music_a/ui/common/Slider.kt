@@ -1,3 +1,4 @@
+import android.content.Context
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -29,17 +30,20 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import ir.flyap.music_a.ui.theme.ExtraSmallSpacer
 import ir.flyap.music_a.ui.theme.dimension
+import ir.flyap.music_a.utill.createImageBitmap
 import ir.flyap.music_a.utill.rememberWindowSize
 
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun SliderImage(
-    imageList: List<ImageBitmap>
-) {
+fun SliderImage() {
+    val context = LocalContext.current
+  val imageList =  context.assets.list("slider")!!.toList().map { createImageBitmap(context, "slider/$it") }
     val sliderSize = rememberWindowSize().width
     val count = imageList.size
     val state = rememberPagerState(initialPage = 0, initialPageOffsetFraction = 0f) { imageList.size }
@@ -51,9 +55,9 @@ fun SliderImage(
             state = state,
             reverseLayout = true,
             modifier = Modifier
+                .fillMaxWidth()
+                .height(150.dp)
                 .padding(horizontal = dimension.medium)
-                .aspectRatio(1f)
-                .size(sliderSize)
                 .clip(MaterialTheme.shapes.small),
         ) { page ->
             slideImage.value = imageList[page]
@@ -62,7 +66,8 @@ fun SliderImage(
                 modifier = Modifier
                     .fillMaxSize(),
                 bitmap = slideImage.value,
-                contentDescription = null
+                contentDescription = null,
+                contentScale = ContentScale.FillBounds
             )
 
         }

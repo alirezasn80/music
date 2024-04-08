@@ -4,15 +4,11 @@ package ir.flyap.music_a.repository
 import android.app.Application
 import android.media.MediaMetadataRetriever
 import android.net.Uri
-import androidx.lifecycle.viewModelScope
 import ir.flyap.music_a.db.AppDB
-import ir.flyap.music_a.model.Audio
+import ir.flyap.music_a.model.Music
 import ir.flyap.music_a.utill.debug
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.util.UUID
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -20,17 +16,18 @@ import javax.inject.Singleton
 class AudioRepository @Inject
 constructor(
     val context: Application,
-    private val db: AppDB,
+    private val db: AppDB
 ) {
-    suspend fun getAudioData(): List<Audio> = withContext(Dispatchers.IO) {
-        val path = "musics"
-        val audios = mutableListOf<Audio>()
+    suspend fun getAllMusic(
+        onSuccess: (List<Music>) -> Unit,
+        onError: (Exception) -> Unit
+    ) {
+        val music = mutableListOf<Music>()
         val mmr = MediaMetadataRetriever()
         val assetManager = context.assets
-        val musicFiles = assetManager.list(path)
-        val musics = db.musicDao.getMusics()
 
         try {
+            val musics = db.musicDao.getAllMusic()
 
             musics.forEach { item ->
 
@@ -39,14 +36,16 @@ constructor(
 
                 val uri = Uri.parse("file:///android_asset/${item.musicPath}")
                 val displayName = item.title
-                val artist = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST) ?: "Unknown Artist"
-                val duration = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION) ?: "Unknown Duration"
-                val title = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE) ?: "Unknown Title"
+                val artist = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST) ?: "ناشناس"
+                val duration = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION) ?: ""
+                val title = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE) ?: "نامشخص"
                 val id = item.id.toString()
-                audios.add(
-                    Audio(
+
+                music.add(
+                    Music(
                         id = id,
                         uri = uri,
+                        fileName = item.musicPath,
                         displayName = displayName,
                         artist = artist,
                         duration = duration.toLong(),
@@ -58,12 +57,76 @@ constructor(
                 )
 
             }
+            onSuccess(music)
         } catch (e: Exception) {
-            debug("error : ${e.message}")
+            onError(e)
         } finally {
             mmr.release()
         }
-        audios
+
+    }
+
+    suspend fun getMusics(
+        album: String,
+        onSuccess: (List<Music>) -> Unit,
+        onError: (Exception) -> Unit
+    ) {
+        val music = mutableListOf<Music>()
+        val mmr = MediaMetadataRetriever()
+        val assetManager = context.assets
+
+        try {
+            val musics = db.musicDao.getMusics(album)
+
+            musics.forEach { item ->
+
+                val assetFileDescriptor = assetManager.openFd(item.musicPath)
+                mmr.setDataSource(assetFileDescriptor.fileDescriptor, assetFileDescriptor.startOffset, assetFileDescriptor.length)
+
+                val uri = Uri.parse("file:///android_asset/${item.musicPath}")
+                val displayName = item.title
+                val artist = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST) ?: "ناشناس"
+                val duration = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION) ?: ""
+                val title = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE) ?: "نامشخص"
+                val id = item.id.toString()
+
+                music.add(
+                    Music(
+                        id = id,
+                        uri = uri,
+                        fileName = item.musicPath,
+                        displayName = displayName,
+                        artist = artist,
+                        duration = duration.toLong(),
+                        title = title,
+                        imagePath = item.imagePath,
+                        lyrics = item.lyrics,
+                        album = item.album
+                    )
+                )
+
+            }
+            onSuccess(music)
+        } catch (e: Exception) {
+            onError(e)
+        } finally {
+            mmr.release()
+        }
+
+    }
+
+    suspend fun getCategories(
+        onSuccess: (List<String>) -> Unit,
+        onError: (Exception) -> Unit
+    ) {
+        try {
+            val albums = mutableListOf("همه")
+            albums.addAll(db.musicDao.getCategoriesByAlbum().filterNotNull())
+            onSuccess(albums)
+        } catch (e: Exception) {
+            onError(e)
+        }
+
     }
 }
 

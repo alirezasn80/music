@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -64,11 +63,11 @@ fun DetailScreen(
     var selectedFrame by remember { mutableStateOf("cover") }
     val context = LocalContext.current
 
-    if (state.currentAudio != null)
+    if (state.currentMusic != null)
         Scaffold(
             topBar = {
                 Header(
-                    title = state.currentAudio!!.displayName,
+                    title = state.currentMusic!!.displayName,
                     upPress = navigationState::upPress,
                     selectedFrame = selectedFrame,
                     onItemClick = { selectedFrame = it }
@@ -76,12 +75,12 @@ fun DetailScreen(
             },
             bottomBar = {
                 BottomMediaBar(
-                    duration = state.currentAudio!!.duration,
+                    duration = state.currentMusic!!.duration,
                     currentDuration = state.currentDuration,
                     isAudioPlaying = viewModel.isPlaying,
                     progress = state.currentProgress,
                     onProgressChange = { viewModel.seekTo(it) },
-                    onStart = { viewModel.playAudio(state.currentAudio!!) },
+                    onStart = { viewModel.playAudio(state.currentMusic!!) },
                     onNextClick = { viewModel.skipToNext() },
                     onPreviousClick = { viewModel.skipToPrevious() }
                 )
@@ -95,9 +94,9 @@ fun DetailScreen(
             ) {
                 SmallSpacer()
                 if (selectedFrame == "cover") {
-                    if (state.currentAudio?.imagePath != null)
+                    if (state.currentMusic?.imagePath != null)
                         Image(
-                            bitmap = createImageBitmap(context, state.currentAudio!!.imagePath!!),
+                            bitmap = createImageBitmap(context, state.currentMusic!!.imagePath!!),
                             contentDescription = null,
                             modifier = Modifier
                                 .padding(vertical = dimension.medium)
@@ -127,7 +126,7 @@ fun DetailScreen(
                             .aspectRatio(1f)
                             .verticalScroll(rememberScrollState()),
                     ) {
-                        Text(text = state.currentAudio!!.lyrics ?: "متنی وجود ندارد!")
+                        Text(text = state.currentMusic!!.lyrics ?: "متنی وجود ندارد!")
                     }
 
                 }

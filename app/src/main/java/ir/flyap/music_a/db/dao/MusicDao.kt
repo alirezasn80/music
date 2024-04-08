@@ -17,12 +17,15 @@ interface MusicDao {
     suspend fun insertMusic(music: MusicEntity)
 
     @Query("SELECT * FROM MusicEntity")
-    suspend fun getMusics(): List<MusicEntity>
+    suspend fun getAllMusic(): List<MusicEntity>
+
+    @Query("SELECT album FROM MusicEntity group by album")
+    suspend fun getCategoriesByAlbum(): List<String?>
 
     @Query("SELECT * FROM MusicEntity WHERE title LIKE :title")
-    suspend fun searchMusicByTitle(title: String): List<MusicEntity>
+    suspend fun searchMusic(title: String): List<MusicEntity>
 
     @Query("SELECT * FROM MusicEntity WHERE album = :album")
-    suspend fun searchMusicByAlbum(album: String): List<MusicEntity>
+    suspend fun getMusics(album: String): List<MusicEntity>
 
 }
