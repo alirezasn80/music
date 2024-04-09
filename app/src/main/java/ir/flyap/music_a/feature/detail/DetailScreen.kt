@@ -1,11 +1,15 @@
 package ir.flyap.music_a.feature.detail
 
+import android.app.Activity
+import android.view.LayoutInflater
+import android.view.ViewGroup
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
@@ -17,6 +21,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.ArrowForward
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -26,6 +31,7 @@ import androidx.compose.material3.Slider
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -41,10 +47,16 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ir.flyap.music_a.R
-import ir.flyap.music_a.feature.home.HomeViewModel
+import ir.flyap.music_a.media.MediaViewModel
 import ir.flyap.music_a.main.navigation.NavigationState
 import ir.flyap.music_a.ui.theme.ExtraSmallSpacer
 import ir.flyap.music_a.ui.theme.LargeSpacer
@@ -57,11 +69,17 @@ import ir.flyap.music_a.utill.timeStampToDuration
 @Composable
 fun DetailScreen(
     navigationState: NavigationState,
-    viewModel: HomeViewModel
+    mediaViewModel: MediaViewModel,
+    detailViewModel: DetailViewModel = hiltViewModel()
 ) {
-    val state by viewModel.state.collectAsStateWithLifecycle()
+    val state by mediaViewModel.state.collectAsStateWithLifecycle()
     var selectedFrame by remember { mutableStateOf("cover") }
     val context = LocalContext.current
+
+    // show Ad
+    LaunchedEffect(Unit) {
+        detailViewModel.requestStandardAd(context as Activity)
+    }
 
     if (state.currentMusic != null)
         Scaffold(
@@ -77,12 +95,12 @@ fun DetailScreen(
                 BottomMediaBar(
                     duration = state.currentMusic!!.duration,
                     currentDuration = state.currentDuration,
-                    isAudioPlaying = viewModel.isPlaying,
+                    isAudioPlaying = mediaViewModel.isPlaying,
                     progress = state.currentProgress,
-                    onProgressChange = { viewModel.seekTo(it) },
-                    onStart = { viewModel.playAudio(state.currentMusic!!) },
-                    onNextClick = { viewModel.skipToNext() },
-                    onPreviousClick = { viewModel.skipToPrevious() }
+                    onProgressChange = { mediaViewModel.seekTo(it) },
+                    onStart = { mediaViewModel.playAudio(state.currentMusic!!) },
+                    onNextClick = { mediaViewModel.skipToNext() },
+                    onPreviousClick = { mediaViewModel.skipToPrevious() }
                 )
             }
         ) { scaffoldPadding ->
@@ -116,24 +134,81 @@ fun DetailScreen(
                             contentScale = ContentScale.Crop
                         )
                 } else {
-                    Column(
+                    var fontSize by remember { mutableStateOf(12.sp) }
+                    Box(
                         modifier = Modifier
                             .padding(vertical = dimension.medium)
                             .clip(MaterialTheme.shapes.small)
                             .background(MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f))
                             .padding(dimension.small)
                             .fillMaxWidth(0.9f)
-                            .aspectRatio(1f)
-                            .verticalScroll(rememberScrollState()),
+                            .aspectRatio(1f),
                     ) {
-                        Text(text = state.currentMusic!!.lyrics ?: "متنی وجود ندارد!")
+                        Column(
+                            Modifier
+                                .fillMaxSize()
+                                .verticalScroll(rememberScrollState())) {
+                            Text(text = state.currentMusic!!.lyrics ?: "متنی وجود ندارد!", fontSize = fontSize)
+                        }
+
+                        TextSize(
+                            fontSize
+                        ) {
+                            fontSize = it
+                        }
                     }
 
                 }
 
-
+                StandardAd(detailViewModel::updateContainer)
             }
         }
+}
+
+@Composable
+fun BoxScope.TextSize(size: TextUnit, onSize: (TextUnit) -> Unit) {
+    Column(
+        Modifier
+            .clip(MaterialTheme.shapes.medium)
+            .background(Color.White.copy(alpha = 0.3f))
+            .align(Alignment.BottomEnd),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Icon(imageVector = Icons.Rounded.Add, contentDescription = null, modifier = Modifier.clickable {
+            onSize(TextUnit(size.value + 1f, TextUnitType.Sp))
+        })
+        SmallSpacer()
+        Text(text = size.value.toInt().toString())
+        SmallSpacer()
+        Icon(
+            imageVector = ImageVector.vectorResource(R.drawable.ic_remove),
+            contentDescription = null,
+            modifier = Modifier.clickable {
+                onSize(TextUnit(size.value - 1f, TextUnitType.Sp))
+            }
+        )
+    }
+}
+
+@Composable
+private fun StandardAd(
+    onUpdate: (ViewGroup) -> Unit,
+) {
+    val context = LocalContext.current as Activity
+
+    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        AndroidView(
+            modifier = Modifier,
+            factory = {
+                val view =
+                    LayoutInflater.from(context)
+                        .inflate(R.layout.standard_banner_container, null, false)
+                val frameLayout = view.findViewById<ViewGroup>(R.id.standardBanner)
+                frameLayout
+            },
+            update = onUpdate
+        )
+    }
 
 }
 

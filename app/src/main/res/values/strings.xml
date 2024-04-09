@@ -24,4 +24,6 @@
     <string name="lyrics">متن</string>
     <string name="music_saved">ذخیره در موزیک</string>
     <string name="music_saved_success">فایل در موزیک ذخیره شد</string>
+    <string name="register">ثبت نام</string>
+    <string name="about_us">درباره ما</string>
 </resources>

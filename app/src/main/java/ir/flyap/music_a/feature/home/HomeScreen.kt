@@ -1,11 +1,15 @@
 package ir.flyap.music_a.feature.home
 
 import SliderImage
+import android.app.Activity
+import android.view.LayoutInflater
+import android.view.ViewGroup
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -33,6 +37,8 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -53,9 +59,12 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ir.flyap.music_a.R
 import ir.flyap.music_a.main.navigation.NavigationState
+import ir.flyap.music_a.media.MediaViewModel
 import ir.flyap.music_a.model.Music
 import ir.flyap.music_a.ui.theme.SmallSpacer
 import ir.flyap.music_a.ui.theme.dimension
@@ -64,11 +73,27 @@ import ir.flyap.music_a.utill.shareFile
 import kotlinx.coroutines.launch
 
 @Composable
-fun HomeScreen(navigationState: NavigationState, viewModel: HomeViewModel) {
-    val state by viewModel.state.collectAsStateWithLifecycle()
+fun HomeScreen(
+    navigationState: NavigationState,
+    mediaViewModel: MediaViewModel,
+    homeViewModel: HomeViewModel = hiltViewModel()
+) {
+    val state by mediaViewModel.state.collectAsStateWithLifecycle()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
-    val context = LocalContext.current
+    val activity = LocalContext.current as Activity
+
+    DisposableEffect(Unit) {
+        onDispose {
+            // viewModel.destroyAd(context)
+        }
+    }
+
+    // show Ad
+    LaunchedEffect(Unit) {
+        homeViewModel.requestStandardAd(activity)
+        homeViewModel.requestInterstitialAd(activity)
+    }
 
     // Close drawer
     BackHandler(drawerState.isOpen) {
@@ -83,7 +108,13 @@ fun HomeScreen(navigationState: NavigationState, viewModel: HomeViewModel) {
                 drawerShape = RectangleShape,
                 drawerContainerColor = MaterialTheme.colorScheme.background,
             ) {
-                DrawerItem(label = R.string.app_name, icon = Icons.Rounded.AddCircle, onClick = {})
+                DrawerItem(label = R.string.register, icon = ImageVector.vectorResource(R.drawable.ic_register), onClick = {})
+
+                DrawerItem(
+                    label = R.string.about_us,
+                    icon = ImageVector.vectorResource(R.drawable.ic_about),
+                    onClick = {}
+                )
             }
         }
     ) {
@@ -92,10 +123,10 @@ fun HomeScreen(navigationState: NavigationState, viewModel: HomeViewModel) {
                 state.currentMusic?.let { currentPlayingAudio ->
                     BottomBarPlayer(
                         music = currentPlayingAudio,
-                        isAudioPlaying = viewModel.isPlaying,
-                        onStart = { viewModel.playAudio(currentPlayingAudio) },
-                        onNext = { viewModel.skipToNext() },
-                        onclick = { navigationState.navToDetail() }
+                        isAudioPlaying = mediaViewModel.isPlaying,
+                        onStart = { mediaViewModel.playAudio(currentPlayingAudio) },
+                        onNext = { mediaViewModel.skipToNext() },
+                        onclick = { homeViewModel.showInterstitialAd(activity, navigationState::navToDetail) }
                     )
                 }
             },
@@ -125,15 +156,22 @@ fun HomeScreen(navigationState: NavigationState, viewModel: HomeViewModel) {
                 SliderImage()
                 AlbumBar(
                     items = state.categories,
-                    onAlbumClick = viewModel::onAlbumClick
+                    onAlbumClick = mediaViewModel::onAlbumClick
                 )
                 SmallSpacer()
-                PlayAll(onClick = { viewModel.playAudio(state.musics[0]) })
+                PlayAll(onClick = { mediaViewModel.playAudio(state.musics[0]) })
+                StandardAd(
+                    onUpdate = homeViewModel::updateStandardBannerContainer
+                )
+                SmallSpacer()
                 LazyColumn {
                     items(state.musics) { audio ->
                         AudioItem(
                             music = audio,
-                            onItemClick = { viewModel.playAudio(audio) },
+                            onItemClick = {
+                                if (!mediaViewModel.isPlaying) mediaViewModel.playAudio(audio)
+                                homeViewModel.showInterstitialAd(activity, navigationState::navToDetail)
+                            },
                             onSaveFileClick = {}
                         )
 
@@ -147,6 +185,28 @@ fun HomeScreen(navigationState: NavigationState, viewModel: HomeViewModel) {
 
 
 }
+
+@Composable
+private fun StandardAd(
+    onUpdate: (ViewGroup) -> Unit = {},
+) {
+    val context = LocalContext.current as Activity
+    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+        AndroidView(
+            modifier = Modifier,
+            factory = {
+                val view =
+                    LayoutInflater.from(context)
+                        .inflate(R.layout.standard_banner_container, null, false)
+                val frameLayout = view.findViewById<ViewGroup>(R.id.standardBanner)
+                frameLayout
+            },
+            update = onUpdate
+        )
+    }
+
+}
+
 
 @Composable
 private fun PlayAll(onClick: () -> Unit) {
