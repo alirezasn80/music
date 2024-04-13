@@ -3,6 +3,7 @@ package ir.flyap.music_a.feature.detail
 import android.app.Activity
 import android.view.ViewGroup
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.unit.TextUnit
 import dagger.hilt.android.lifecycle.HiltViewModel
 import ir.flyap.music_a.tapsell.Tapsell
 import ir.flyap.music_a.utill.BaseViewModel
@@ -13,6 +14,7 @@ import ir.tapsell.plus.TapsellPlus
 import ir.tapsell.plus.TapsellPlusBannerType
 import ir.tapsell.plus.model.TapsellPlusAdModel
 import ir.tapsell.plus.model.TapsellPlusErrorModel
+import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 @HiltViewModel
@@ -20,6 +22,10 @@ class DetailViewModel @Inject constructor(
 ) : BaseViewModel<DetailState>(DetailState()) {
     private var responseId: String? = null
     private var standardBannerContainer = mutableStateOf<ViewGroup?>(null)
+
+    fun setFontSizeValue(value:TextUnit){
+        state.update { it.copy(fontSize = value) }
+    }
 
     fun requestStandardAd(
         activity: Activity,

@@ -1,14 +1,9 @@
-import android.content.Context
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -27,9 +22,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
@@ -38,12 +31,13 @@ import ir.flyap.music_a.ui.theme.dimension
 import ir.flyap.music_a.utill.createImageBitmap
 import ir.flyap.music_a.utill.rememberWindowSize
 
-
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun SliderImage() {
     val context = LocalContext.current
-  val imageList =  context.assets.list("slider")!!.toList().map { createImageBitmap(context, "slider/$it") }
+  val imageList = remember {
+      context.assets.list("slider")!!.toList().map { createImageBitmap(context, "slider/$it") }
+  }
     val sliderSize = rememberWindowSize().width
     val count = imageList.size
     val state = rememberPagerState(initialPage = 0, initialPageOffsetFraction = 0f) { imageList.size }

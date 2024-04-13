@@ -47,11 +47,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -72,7 +70,8 @@ fun DetailScreen(
     mediaViewModel: MediaViewModel,
     detailViewModel: DetailViewModel = hiltViewModel()
 ) {
-    val state by mediaViewModel.state.collectAsStateWithLifecycle()
+    val mediaState by mediaViewModel.state.collectAsStateWithLifecycle()
+    val detailState by detailViewModel.state.collectAsStateWithLifecycle()
     var selectedFrame by remember { mutableStateOf("cover") }
     val context = LocalContext.current
 
@@ -81,11 +80,11 @@ fun DetailScreen(
         detailViewModel.requestStandardAd(context as Activity)
     }
 
-    if (state.currentMusic != null)
+    if (mediaState.currentMusic != null)
         Scaffold(
             topBar = {
                 Header(
-                    title = state.currentMusic!!.displayName,
+                    title = mediaState.currentMusic!!.displayName,
                     upPress = navigationState::upPress,
                     selectedFrame = selectedFrame,
                     onItemClick = { selectedFrame = it }
@@ -93,12 +92,12 @@ fun DetailScreen(
             },
             bottomBar = {
                 BottomMediaBar(
-                    duration = state.currentMusic!!.duration,
-                    currentDuration = state.currentDuration,
+                    duration = mediaState.currentMusic!!.duration,
+                    currentDuration = mediaState.currentDuration,
                     isAudioPlaying = mediaViewModel.isPlaying,
-                    progress = state.currentProgress,
+                    progress = mediaState.currentProgress,
                     onProgressChange = { mediaViewModel.seekTo(it) },
-                    onStart = { mediaViewModel.playAudio(state.currentMusic!!) },
+                    onStart = { mediaViewModel.playAudio(mediaState.currentMusic!!) },
                     onNextClick = { mediaViewModel.skipToNext() },
                     onPreviousClick = { mediaViewModel.skipToPrevious() }
                 )
@@ -112,9 +111,9 @@ fun DetailScreen(
             ) {
                 SmallSpacer()
                 if (selectedFrame == "cover") {
-                    if (state.currentMusic?.imagePath != null)
+                    if (mediaState.currentMusic?.imagePath != null)
                         Image(
-                            bitmap = createImageBitmap(context, state.currentMusic!!.imagePath!!),
+                            bitmap = createImageBitmap(context, mediaState.currentMusic!!.imagePath!!),
                             contentDescription = null,
                             modifier = Modifier
                                 .padding(vertical = dimension.medium)
@@ -134,7 +133,6 @@ fun DetailScreen(
                             contentScale = ContentScale.Crop
                         )
                 } else {
-                    var fontSize by remember { mutableStateOf(12.sp) }
                     Box(
                         modifier = Modifier
                             .padding(vertical = dimension.medium)
@@ -147,14 +145,15 @@ fun DetailScreen(
                         Column(
                             Modifier
                                 .fillMaxSize()
-                                .verticalScroll(rememberScrollState())) {
-                            Text(text = state.currentMusic!!.lyrics ?: "متنی وجود ندارد!", fontSize = fontSize)
+                                .verticalScroll(rememberScrollState())
+                        ) {
+                            Text(text = mediaState.currentMusic!!.lyrics ?: "متنی وجود ندارد!", fontSize = detailState.fontSize)
                         }
 
                         TextSize(
-                            fontSize
+                            detailState.fontSize
                         ) {
-                            fontSize = it
+                            detailViewModel.setFontSizeValue(it)
                         }
                     }
 
