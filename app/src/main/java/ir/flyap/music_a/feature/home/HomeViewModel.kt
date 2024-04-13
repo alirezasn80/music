@@ -85,12 +85,10 @@ class HomeViewModel @Inject constructor(
             object : AdShowListener() {
                 override fun onOpened(tapsellPlusAdModel: TapsellPlusAdModel) {
                     super.onOpened(tapsellPlusAdModel)
-                    debug("onOpened")
                 }
 
                 override fun onClosed(tapsellPlusAdModel: TapsellPlusAdModel) {
                     super.onClosed(tapsellPlusAdModel)
-                    debug("onClosed")
                     navToDetail()
                 }
 

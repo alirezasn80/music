@@ -23,7 +23,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.AddCircle
 import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.material.icons.rounded.Share
 import androidx.compose.material3.DrawerValue
@@ -33,6 +32,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Slider
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
@@ -40,6 +40,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -70,6 +71,7 @@ import ir.flyap.music_a.ui.theme.SmallSpacer
 import ir.flyap.music_a.ui.theme.dimension
 import ir.flyap.music_a.utill.createImageBitmap
 import ir.flyap.music_a.utill.shareFile
+import ir.flyap.music_a.utill.showToast
 import kotlinx.coroutines.launch
 
 @Composable
@@ -78,7 +80,7 @@ fun HomeScreen(
     mediaViewModel: MediaViewModel,
     homeViewModel: HomeViewModel = hiltViewModel()
 ) {
-    val state by mediaViewModel.state.collectAsStateWithLifecycle()
+    val mediaState by mediaViewModel.state.collectAsStateWithLifecycle()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     val activity = LocalContext.current as Activity
@@ -120,10 +122,11 @@ fun HomeScreen(
     ) {
         Scaffold(
             bottomBar = {
-                state.currentMusic?.let { currentPlayingAudio ->
+                MySliderDemo()
+                mediaState.currentMusic?.let { currentPlayingAudio ->
                     BottomBarPlayer(
                         music = currentPlayingAudio,
-                        isAudioPlaying = mediaViewModel.isPlaying,
+                        isAudioPlaying = mediaState.isPlaying,//todo(changed)
                         onStart = { mediaViewModel.playAudio(currentPlayingAudio) },
                         onNext = { mediaViewModel.skipToNext() },
                         onclick = { homeViewModel.showInterstitialAd(activity, navigationState::navToDetail) }
@@ -155,21 +158,21 @@ fun HomeScreen(
                 SmallSpacer()
                 SliderImage()
                 AlbumBar(
-                    items = state.categories,
+                    items = mediaState.categories,
                     onAlbumClick = mediaViewModel::onAlbumClick
                 )
                 SmallSpacer()
-                PlayAll(onClick = { mediaViewModel.playAudio(state.musics[0]) })
+                PlayAll(onClick = { mediaViewModel.playAudio(mediaState.musics[0]) })
                 StandardAd(
                     onUpdate = homeViewModel::updateStandardBannerContainer
                 )
                 SmallSpacer()
                 LazyColumn {
-                    items(state.musics) { audio ->
+                    items(mediaState.musics) { audio ->
                         AudioItem(
                             music = audio,
                             onItemClick = {
-                                if (!mediaViewModel.isPlaying) mediaViewModel.playAudio(audio)
+                                if (audio.id != mediaState.currentMusic?.id) mediaViewModel.playAudio(audio)
                                 homeViewModel.showInterstitialAd(activity, navigationState::navToDetail)
                             },
                             onSaveFileClick = {}
@@ -184,6 +187,20 @@ fun HomeScreen(
     }
 
 
+}
+
+@Composable
+fun MySliderDemo() {
+    val context = LocalContext.current
+    var sliderPosition by remember { mutableFloatStateOf(0f) }
+    Text(text = sliderPosition.toString())
+    Slider(
+        value = sliderPosition,
+        onValueChange = { sliderPosition = it },
+        onValueChangeFinished = {
+            context.showToast("result : $sliderPosition")
+        }
+    )
 }
 
 @Composable

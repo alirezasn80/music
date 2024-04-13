@@ -22,8 +22,8 @@ internal class MediaPlayerNotificationManager(
 
         val builder = PlayerNotificationManager.Builder(
             context,
-            K.PLAYBACK_NOTIFICATION_ID,
-            K.PLAYBACK_NOTIFICATION_CHANNEL_ID
+            MediaSetting.PLAYBACK_NOTIFICATION_ID,
+            MediaSetting.PLAYBACK_NOTIFICATION_CHANNEL_ID
         )
 
         with(builder) {

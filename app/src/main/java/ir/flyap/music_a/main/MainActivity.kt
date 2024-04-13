@@ -16,17 +16,20 @@ import ir.flyap.music_a.main.navigation.Screen
 import ir.flyap.music_a.main.navigation.rememberNavigationState
 import ir.flyap.music_a.ui.theme.MusicTheme
 import ir.flyap.music_a.utill.LocaleUtils
+import ir.flyap.music_a.utill.debug
 
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    private  var mediaViewModel: MediaViewModel? =null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, true)
         LocaleUtils.updateResources(this)
         setContent {
             val navigationState = rememberNavigationState()
-            val mediaViewModel: MediaViewModel = hiltViewModel()
+            mediaViewModel = hiltViewModel()
 
 
             MusicTheme {
@@ -42,20 +45,45 @@ class MainActivity : ComponentActivity() {
                     composable(Screen.Home.route) {
                         HomeScreen(
                             navigationState = navigationState,
-                            mediaViewModel = mediaViewModel
+                            mediaViewModel = mediaViewModel!!
                         )
                     }
 
                     composable(Screen.Detail.route) {
                         DetailScreen(
                             navigationState = navigationState,
-                            mediaViewModel = mediaViewModel
+                            mediaViewModel = mediaViewModel!!
                         )
                     }
 
                 }
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        debug("onResume")
+    }
+
+    override fun onStop() {
+        super.onStop()
+        debug("onStop")
+    }
+
+    override fun onPause() {
+        super.onPause()
+        debug("onPause")
+    }
+
+    override fun onStart() {
+        super.onStart()
+        debug("onStart")
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        debug("onDestroy")
     }
 
 }

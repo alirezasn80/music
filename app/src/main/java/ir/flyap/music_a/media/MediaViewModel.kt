@@ -1,11 +1,8 @@
 package ir.flyap.music_a.media
 
-import android.app.Activity
 import android.support.v4.media.MediaBrowserCompat
-import android.view.ViewGroup
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -14,15 +11,8 @@ import ir.flyap.music_a.feature.home.HomeState
 import ir.flyap.music_a.model.Music
 import ir.flyap.music_a.repository.AudioRepository
 import ir.flyap.music_a.service.MediaPlayerService
-import ir.flyap.music_a.tapsell.Tapsell
 import ir.flyap.music_a.utill.BaseViewModel
 import ir.flyap.music_a.utill.debug
-import ir.tapsell.plus.AdRequestCallback
-import ir.tapsell.plus.AdShowListener
-import ir.tapsell.plus.TapsellPlus
-import ir.tapsell.plus.TapsellPlusBannerType
-import ir.tapsell.plus.model.TapsellPlusAdModel
-import ir.tapsell.plus.model.TapsellPlusErrorModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.update
@@ -47,7 +37,6 @@ class MediaViewModel @Inject constructor(
             children: MutableList<MediaBrowserCompat.MediaItem>
         ) {
             super.onChildrenLoaded(parentId, children)
-            debug("onChildren call back")
         }
     }
 
@@ -61,7 +50,7 @@ class MediaViewModel @Inject constructor(
 
     //--------------------------------------------------------------------------------
 
-    val isPlaying: Boolean get() = playbackState.value?.isPlaying == true
+    private val _isPlaying: Boolean get() = playbackState.value?.isPlaying == true
 
     val currentDuration: Long get() = MediaPlayerService.currentDuration
 
@@ -125,6 +114,11 @@ class MediaViewModel @Inject constructor(
             object : MediaPlayerServiceConnectionListener {
                 override fun onAudioChanged(music: Music) {
                     state.update { it.copy(currentMusic = music) }
+
+                }
+
+                override fun updatePlayPauseButton(isPlaying: Boolean) {
+                    state.update { it.copy(isPlaying = isPlaying) }
                 }
 
             }
@@ -135,22 +129,23 @@ class MediaViewModel @Inject constructor(
 
     fun playAudio(music: Music) {
 
-        // why call it?
+        // necessary when click on forward and back the music
         serviceConnection.playAudio(state.value.musics)
+
+
         val prevAudio = state.value.currentMusic?.id
-
         if (music.id == prevAudio) {
+            state.update { it.copy(isPlaying = !_isPlaying) }
 
-            if (isPlaying) {
+            if (_isPlaying) {
                 serviceConnection.transportControl.pause()
             } else {
                 serviceConnection.transportControl.play()
             }
 
         } else {
-            state.update { it.copy(currentMusic = music) }
-            // todo(should change media id to uri)
-            serviceConnection.transportControl.playFromMediaId(music.uri.toString(), null)
+            state.update { it.copy(currentMusic = music, isPlaying = true) }
+            serviceConnection.transportControl.playFromMediaId(music.uri.toString(), null)// todo(should change media id to uri)
         }
 
 
@@ -200,7 +195,8 @@ class MediaViewModel @Inject constructor(
                 state.update { it.copy(currentProgress = currentProgress) }
             }
 
-            delay(K.PLAYBACK_UPDATE_INTERVAL)
+            delay(MediaSetting.PLAYBACK_UPDATE_INTERVAL)
+
             if (updatePosition) {
                 updatePlayBack()
             }
@@ -215,14 +211,13 @@ class MediaViewModel @Inject constructor(
     override fun onCleared() {
         super.onCleared()
         serviceConnection.unSubscribe(
-            K.MEDIA_ROOT_ID,
+            MediaSetting.MEDIA_ROOT_ID,
             object : MediaBrowserCompat.SubscriptionCallback() {}
         )
         updatePosition = false
     }
 
     fun onAlbumClick(album: String) {
-        debug("album : $album")
         if (album == "همه") {
             getAllMusic()
             return

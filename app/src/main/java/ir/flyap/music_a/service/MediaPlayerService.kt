@@ -15,7 +15,6 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.media.MediaBrowserServiceCompat
 import com.google.android.exoplayer2.ExoPlayer
-import com.google.android.exoplayer2.MediaMetadata
 import com.google.android.exoplayer2.PlaybackException
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
@@ -24,7 +23,7 @@ import com.google.android.exoplayer2.ui.PlayerNotificationManager
 import com.google.android.exoplayer2.upstream.cache.CacheDataSource
 import dagger.hilt.android.AndroidEntryPoint
 import ir.flyap.music_a.R
-import ir.flyap.music_a.media.K
+import ir.flyap.music_a.media.MediaSetting
 import ir.flyap.music_a.media.MediaPlayerNotificationManager
 import ir.flyap.music_a.media.MediaSource
 import ir.flyap.music_a.utill.debug
@@ -102,7 +101,6 @@ class MediaPlayerService : MediaBrowserServiceCompat() {
 
         }
         mediaPlayerNotificationManager.showNotification(exoPlayer)
-
     }
 
     override fun onGetRoot(
@@ -110,16 +108,15 @@ class MediaPlayerService : MediaBrowserServiceCompat() {
         clientUid: Int,
         rootHints: Bundle?
     ): BrowserRoot {
-        return BrowserRoot(K.MEDIA_ROOT_ID, null)
+        return BrowserRoot(MediaSetting.MEDIA_ROOT_ID, null)
     }
 
     override fun onLoadChildren(
         parentId: String,
         result: Result<MutableList<MediaBrowserCompat.MediaItem>>
     ) {
-
         when (parentId) {
-            K.MEDIA_ROOT_ID -> {
+            MediaSetting.MEDIA_ROOT_ID -> {
 
                 val resultsSent = mediaSource.whenReady { isInitialized ->
 
@@ -142,8 +139,6 @@ class MediaPlayerService : MediaBrowserServiceCompat() {
 
 
         }
-
-
     }
 
 
@@ -155,21 +150,19 @@ class MediaPlayerService : MediaBrowserServiceCompat() {
         super.onCustomAction(action, extras, result)
         when (action) {
 
-            K.START_MEDIA_PLAY_ACTION -> {
+            MediaSetting.START_MEDIA_PLAY_ACTION -> {
                 mediaPlayerNotificationManager.showNotification(exoPlayer)
             }
 
-            K.REFRESH_MEDIA_PLAY_ACTION -> {
+            MediaSetting.REFRESH_MEDIA_PLAY_ACTION -> {
                 mediaSource.refresh()
-                notifyChildrenChanged(K.MEDIA_ROOT_ID)
+                notifyChildrenChanged(MediaSetting.MEDIA_ROOT_ID)
             }
 
             else -> Unit
 
 
         }
-
-
     }
 
     override fun onTaskRemoved(rootIntent: Intent?) {
@@ -312,7 +305,6 @@ class MediaPlayerService : MediaBrowserServiceCompat() {
     private inner class PlayerEventListener : Player.Listener {
 
         override fun onPlaybackStateChanged(playbackState: Int) {
-
             when (playbackState) {
                 Player.STATE_BUFFERING,
                 Player.STATE_READY -> {
@@ -334,6 +326,7 @@ class MediaPlayerService : MediaBrowserServiceCompat() {
         override fun onEvents(player: Player, events: Player.Events) {
             super.onEvents(player, events)
             currentDuration = player.duration
+
         }
 
         override fun onPlayerError(error: PlaybackException) {

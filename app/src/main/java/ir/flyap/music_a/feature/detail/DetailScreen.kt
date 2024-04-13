@@ -7,6 +7,8 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsDraggedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
@@ -26,6 +28,7 @@ import androidx.compose.material.icons.rounded.ArrowForward
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RangeSlider
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Surface
@@ -33,6 +36,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -62,6 +66,7 @@ import ir.flyap.music_a.ui.theme.MediumSpacer
 import ir.flyap.music_a.ui.theme.SmallSpacer
 import ir.flyap.music_a.ui.theme.dimension
 import ir.flyap.music_a.utill.createImageBitmap
+import ir.flyap.music_a.utill.debug
 import ir.flyap.music_a.utill.timeStampToDuration
 
 @Composable
@@ -94,7 +99,7 @@ fun DetailScreen(
                 BottomMediaBar(
                     duration = mediaState.currentMusic!!.duration,
                     currentDuration = mediaState.currentDuration,
-                    isAudioPlaying = mediaViewModel.isPlaying,
+                    isAudioPlaying = mediaState.isPlaying,// todo(i change it)
                     progress = mediaState.currentProgress,
                     onProgressChange = { mediaViewModel.seekTo(it) },
                     onStart = { mediaViewModel.playAudio(mediaState.currentMusic!!) },
@@ -222,6 +227,18 @@ fun BottomMediaBar(
     onNextClick: () -> Unit,
     onPreviousClick: () -> Unit,
 ) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val isDragging by interactionSource.collectIsDraggedAsState()
+    var currentProgress by remember { mutableFloatStateOf(0f) }
+    LaunchedEffect(progress) {
+        if (!isDragging)
+            currentProgress = progress
+    }
+
+    LaunchedEffect(isDragging) {
+        debug("dragging : $isDragging")
+    }
+
     Column(
         Modifier
             .fillMaxWidth()
@@ -231,9 +248,15 @@ fun BottomMediaBar(
     ) {
         Column {
             Slider(
-                value = progress,
-                onValueChange = { onProgressChange.invoke(it) },
-                valueRange = 0f..100f
+                value = currentProgress,
+                onValueChange = {
+                    currentProgress = it
+                },
+                valueRange = 0f..100f,
+                onValueChangeFinished = {
+                    onProgressChange.invoke(currentProgress)
+                },
+                interactionSource = interactionSource
             )
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                 Text(text = timeStampToDuration(duration))

@@ -9,12 +9,14 @@ import android.support.v4.media.session.PlaybackStateCompat
 import dagger.hilt.android.qualifiers.ApplicationContext
 import ir.flyap.music_a.model.Music
 import ir.flyap.music_a.service.MediaPlayerService
+import ir.flyap.music_a.utill.debug
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
 
 interface MediaPlayerServiceConnectionListener {
     fun onAudioChanged(music: Music)
+    fun updatePlayPauseButton(isPlaying: Boolean)
 }
 
 class MediaPlayerServiceConnection @Inject constructor(
@@ -61,7 +63,7 @@ class MediaPlayerServiceConnection @Inject constructor(
 
     fun playAudio(music: List<Music>) {
         musicList = music
-        mediaBrowser.sendCustomAction(K.START_MEDIA_PLAY_ACTION, null, null)
+        mediaBrowser.sendCustomAction(MediaSetting.START_MEDIA_PLAY_ACTION, null, null)
     }
 
     fun fastForward(seconds: Int = 10) {
@@ -100,7 +102,7 @@ class MediaPlayerServiceConnection @Inject constructor(
 
     fun refreshMediaBrowserChildren() {
         mediaBrowser.sendCustomAction(
-            K.REFRESH_MEDIA_PLAY_ACTION,
+            MediaSetting.REFRESH_MEDIA_PLAY_ACTION,
             null,
             null
         )
@@ -131,12 +133,17 @@ class MediaPlayerServiceConnection @Inject constructor(
 
     private inner class MediaControllerCallBack : MediaControllerCompat.Callback() {
 
+        // Call when changed current on service
         override fun onPlaybackStateChanged(state: PlaybackStateCompat?) {
             super.onPlaybackStateChanged(state)
+            debug("onPlaybackStateChanged")
+            _listener.updatePlayPauseButton(state?.isPlaying == true)
             _playBackState.value = state
         }
 
+        // Call when change totally on service
         override fun onMetadataChanged(metadata: MediaMetadataCompat?) {
+            debug("onMetadataChanged")
             super.onMetadataChanged(metadata)
 
             metadata?.let { data ->
