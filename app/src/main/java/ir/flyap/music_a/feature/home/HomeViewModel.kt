@@ -72,7 +72,7 @@ class HomeViewModel @Inject constructor(
 
                     override fun onError(tapsellPlusErrorModel: TapsellPlusErrorModel) {
                         super.onError(tapsellPlusErrorModel)
-                        debug("error show ad : ${tapsellPlusErrorModel.toString()}")
+                        debug("error show ad : $tapsellPlusErrorModel")
                     }
                 })
             // isShowButtonEnabled.value = false
@@ -94,12 +94,11 @@ class HomeViewModel @Inject constructor(
 
                 override fun onRewarded(tapsellPlusAdModel: TapsellPlusAdModel) {
                     super.onRewarded(tapsellPlusAdModel)
-                    debug("on rewarded")
                 }
 
                 override fun onError(tapsellPlusErrorModel: TapsellPlusErrorModel) {
                     super.onError(tapsellPlusErrorModel)
-                    debug(tapsellPlusErrorModel.toString())
+                    navToDetail()
                 }
             })
     }

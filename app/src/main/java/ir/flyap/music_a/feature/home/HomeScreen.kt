@@ -122,7 +122,7 @@ fun HomeScreen(
     ) {
         Scaffold(
             bottomBar = {
-                MySliderDemo()
+
                 mediaState.currentMusic?.let { currentPlayingAudio ->
                     BottomBarPlayer(
                         music = currentPlayingAudio,
@@ -187,20 +187,6 @@ fun HomeScreen(
     }
 
 
-}
-
-@Composable
-fun MySliderDemo() {
-    val context = LocalContext.current
-    var sliderPosition by remember { mutableFloatStateOf(0f) }
-    Text(text = sliderPosition.toString())
-    Slider(
-        value = sliderPosition,
-        onValueChange = { sliderPosition = it },
-        onValueChangeFinished = {
-            context.showToast("result : $sliderPosition")
-        }
-    )
 }
 
 @Composable
