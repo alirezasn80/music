@@ -50,7 +50,7 @@ object Tapsell {
         if (DEBUG)
             "5cfaa942e8d17f0001ffb292"// Test
         else
-            "main"// Main
+            "661a3ee98b1af86a0b6f331b"// Main
     }
 
     val RewardedVideo by lazy {
