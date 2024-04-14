@@ -56,13 +56,13 @@ class MediaViewModel @Inject constructor(
 
 
     init {
-
         initMediaPlayerServiceConnectionListener()
         getAllMusic()
         getCategories()
-        updateSubscribe()
+        //updateSubscribe()
     }
 
+    // getAlbums
     private fun getCategories() {
         viewModelScope.launch(Dispatchers.IO) {
             repository.getCategories(
@@ -70,7 +70,7 @@ class MediaViewModel @Inject constructor(
                     state.update { it.copy(categories = items) }
                 },
                 onError = {
-                    debug(it.message)
+                    setMessageByToast(R.string.unknown_error)
                 }
             )
 
@@ -102,7 +102,7 @@ class MediaViewModel @Inject constructor(
                     state.update { it.copy(musics = items) }
                 },
                 onError = {
-                    setMessageBySnackbar(R.string.unknown_error)
+                    setMessageByToast(R.string.unknown_error)
                 }
             )
         }
@@ -112,9 +112,9 @@ class MediaViewModel @Inject constructor(
     private fun initMediaPlayerServiceConnectionListener() {
         serviceConnection.initListener(
             object : MediaPlayerServiceConnectionListener {
+
                 override fun onAudioChanged(music: Music) {
                     state.update { it.copy(currentMusic = music) }
-
                 }
 
                 override fun updatePlayPauseButton(isPlaying: Boolean) {

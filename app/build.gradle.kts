@@ -3,6 +3,18 @@ plugins {
     alias(libs.plugins.jetbrainsKotlinAndroid)
     id("com.google.devtools.ksp")
     id("com.google.dagger.hilt.android")
+    id("appmetrica-plugin")
+    id("com.google.gms.google-services")
+}
+
+appmetrica {
+    postApiKey = { applicationVariant -> "2853adba-8526-4bd4-8cef-4810d384388d" }
+    enable = { applicationVariant -> true }    // Optional.
+    setMappingBuildTypes(listOf("release"))            // Optional.
+    setOffline(false)                            // Optional.
+    mappingFile = { applicationVariant -> null }   // Optional.
+    enableAnalytics = true                     // Optional.
+    allowTwoAppMetricas = { applicationVariant -> false }  // Optional.
 }
 
 android {
@@ -99,5 +111,13 @@ dependencies {
 
     // Poolakey
     implementation("com.github.cafebazaar.Poolakey:poolakey:2.2.0")
+
+    // AppMetrica SDK.
+    implementation("io.appmetrica.analytics:analytics:6.1.0")
+    implementation("io.appmetrica.analytics:push:3.0.0")
+    implementation("androidx.legacy:legacy-support-v4:1.0.0")
+
+    // Firebase
+    implementation(libs.firebase.messaging)
 
 }

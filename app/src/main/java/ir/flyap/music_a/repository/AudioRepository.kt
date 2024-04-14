@@ -4,6 +4,7 @@ package ir.flyap.music_a.repository
 import android.app.Application
 import android.media.MediaMetadataRetriever
 import android.net.Uri
+import io.appmetrica.analytics.AppMetrica
 import ir.flyap.music_a.db.AppDB
 import ir.flyap.music_a.model.Music
 import ir.flyap.music_a.utill.debug
@@ -59,6 +60,7 @@ constructor(
             }
             onSuccess(music)
         } catch (e: Exception) {
+            AppMetrica.reportError("Error in get all musics", e)
             onError(e)
         } finally {
             mmr.release()
@@ -124,6 +126,7 @@ constructor(
             albums.addAll(db.musicDao.getCategoriesByAlbum().filterNotNull())
             onSuccess(albums)
         } catch (e: Exception) {
+            AppMetrica.reportError("Error in get Categories(Albums)", e)
             onError(e)
         }
 
