@@ -7,12 +7,10 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import ir.flyap.music_a.R
-import ir.flyap.music_a.feature.home.HomeState
 import ir.flyap.music_a.model.Music
 import ir.flyap.music_a.repository.AudioRepository
 import ir.flyap.music_a.service.MediaPlayerService
 import ir.flyap.music_a.utill.BaseViewModel
-import ir.flyap.music_a.utill.debug
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.update
@@ -23,7 +21,7 @@ import javax.inject.Inject
 class MediaViewModel @Inject constructor(
     private val repository: AudioRepository,
     serviceConnection: MediaPlayerServiceConnection
-) : BaseViewModel<HomeState>(HomeState()) {
+) : BaseViewModel<MediaState>(MediaState()) {
 
 
     //-----------------------------------------------------------------------------------

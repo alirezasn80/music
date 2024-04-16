@@ -3,9 +3,12 @@ package ir.flyap.music_a.feature.home
 import android.app.Activity
 import android.view.ViewGroup
 import androidx.compose.runtime.mutableStateOf
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import ir.flyap.music_a.cache.datastore.DataStore
 import ir.flyap.music_a.tapsell.Tapsell
+import ir.flyap.music_a.utill.BaseViewModel
+import ir.flyap.music_a.utill.Key
 import ir.flyap.music_a.utill.debug
 import ir.tapsell.plus.AdRequestCallback
 import ir.tapsell.plus.AdShowListener
@@ -13,15 +16,86 @@ import ir.tapsell.plus.TapsellPlus
 import ir.tapsell.plus.TapsellPlusBannerType
 import ir.tapsell.plus.model.TapsellPlusAdModel
 import ir.tapsell.plus.model.TapsellPlusErrorModel
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import javax.inject.Inject
-import kotlin.reflect.KFunction0
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-) : ViewModel() {
+    private val dataStore: DataStore,
+) : BaseViewModel<HomeState>(HomeState()) {
     private var standardResponseId: String? = null
     private var interstitialResponseId: String? = null
     private var standardBannerContainer = mutableStateOf<ViewGroup?>(null)
+
+    // private var connection: CheckUpdateApp? = null
+
+    init {
+        checkUpdate()
+        openAppCounter()
+        getCommentStatus()
+    }
+
+    fun hideNotificationAlert() = state.update { it.copy(showNotificationAlert = false) }
+
+    private fun checkUpdate() {
+        /*connection = CheckUpdateApp(object : CheckUpdateAppListener {
+            override fun needUpdate(value: Boolean) {
+                state.update { it.copy(needUpdate = value) }
+                connection?.let {
+                    application.unbindService(it);
+                    connection = null
+                }
+
+            }
+        })
+        val i = Intent("com.farsitel.bazaar.service.UpdateCheckService.BIND")
+        i.setPackage("com.farsitel.bazaar")
+        application.bindService(i, connection!!, Context.BIND_AUTO_CREATE)*/
+    }
+
+    private fun openAppCounter() {
+
+        viewModelScope.launch {
+            // Calculate number of user open application
+            var count = dataStore.getOpenAppCounter(Key.COUNTER)
+            count++
+            dataStore.setOpenAppCounter(Key.COUNTER, count)
+            state.update { it.copy(openAppCount = count) }
+        }
+
+    }
+
+    private fun getCommentStatus() {
+        viewModelScope.launch {
+            val commentStatus = dataStore.getCommentStatus(Key.COMMENT)
+            state.update { it.copy(showComment = commentStatus == null) }
+        }
+    }
+
+    fun hideNeedUpdate() = state.update { it.copy(needUpdate = false) }
+
+    fun hideCommentItem(status: String) {
+        viewModelScope.launch {
+            dataStore.setCommentStatus(Key.COMMENT, status)
+            state.update { it.copy(showComment = false) }
+        }
+    }
+
+    fun setDialogKey(key: HomeDialogKey) {
+        state.update { it.copy(dialogKey = key) }
+    }
+
+    fun resetOpenAppCounter() {
+        viewModelScope.launch {
+            dataStore.setOpenAppCounter(Key.COUNTER, 0)
+            state.update { it.copy(openAppCount = 0) }
+        }
+    }
+
+
+
+
 
     fun requestStandardAd(
         activity: Activity,
@@ -80,7 +154,7 @@ class HomeViewModel @Inject constructor(
 
     }
 
-    fun showInterstitialAd(activity: Activity, navToDetail: ()->Unit) {
+    fun showInterstitialAd(activity: Activity, navToDetail: () -> Unit) {
         TapsellPlus.showInterstitialAd(activity, interstitialResponseId,
             object : AdShowListener() {
                 override fun onOpened(tapsellPlusAdModel: TapsellPlusAdModel) {
@@ -107,4 +181,5 @@ class HomeViewModel @Inject constructor(
     fun updateStandardBannerContainer(viewGroup: ViewGroup) {
         standardBannerContainer.value = viewGroup
     }
+
 }

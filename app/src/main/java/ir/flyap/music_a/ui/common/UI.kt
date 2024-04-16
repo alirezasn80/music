@@ -8,9 +8,11 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import ir.flyap.music_a.R
 import ir.flyap.music_a.ui.theme.LargeSpacer
@@ -139,6 +141,30 @@ private fun HandleUiComponents(
                 WidgetType.Toast -> Toast.makeText(context, message, Toast.LENGTH_LONG).show()
             }
         }
+
+    }
+}
+
+@Composable
+fun BaseTextButton(
+    modifier: Modifier = Modifier,
+    text: Any,
+    contentColor: Color = MaterialTheme.colorScheme.primary,
+    fontSize: TextUnit = TextUnit.Unspecified,
+    onclick: () -> Unit,
+) {
+    val textButton = when (text) {
+        is Int -> stringResource(id = text)
+        is String -> text
+        else -> ""
+    }
+
+    TextButton(onClick = onclick, modifier = modifier) {
+        Text(
+            text = textButton,
+            style = MaterialTheme.typography.titleSmall.copy(color = contentColor),
+            fontSize = fontSize
+        )
 
     }
 }

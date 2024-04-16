@@ -4,10 +4,13 @@ import android.content.Context
 import android.content.Intent
 import android.content.res.AssetManager
 import android.graphics.BitmapFactory
+import android.net.Uri
 import android.os.Environment
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
+import io.appmetrica.analytics.AppMetrica
 import ir.flyap.music_a.R
 import ir.flyap.music_a.model.Music
 import java.io.File
@@ -92,7 +95,7 @@ fun saveInMusics(
 }
 
 // Method to copy a file from assets to the Downloads folder
- fun copyFileToDownloads(context: Context, fileName: String) {
+fun copyFileToDownloads(context: Context, fileName: String) {
     val assetManager: AssetManager = context.assets
     var `in`: InputStream? = null
     var out: OutputStream? = null
@@ -130,4 +133,31 @@ fun saveInMusics(
             e.printStackTrace() // Handle the exception
         }
     }
+}
+
+
+fun Context.shareText(textId: Int) {
+    try {
+        val sendIntent: Intent = Intent().apply {
+            action = Intent.ACTION_SEND
+            putExtra(Intent.EXTRA_TEXT, getString(textId))
+            type = "text/plain"
+        }
+        ContextCompat.startActivity(this, Intent.createChooser(sendIntent, ""), null)
+    } catch (e: Exception) {
+        AppMetrica.reportError("Problem to share text with intent", e)
+    }
+
+}
+
+fun Context.openBazaarComment() {
+    try {
+        val intent = Intent(Intent.ACTION_EDIT)
+        intent.setData(Uri.parse("bazaar://details?id=ir.flyap.music_a"))
+        intent.setPackage("com.farsitel.bazaar")
+        startActivity(intent)
+    } catch (e: Exception) {
+        AppMetrica.reportError("Error : Open Cafe Bazaar to send comment", e)
+    }
+
 }

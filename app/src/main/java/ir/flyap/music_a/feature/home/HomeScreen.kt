@@ -2,8 +2,13 @@ package ir.flyap.music_a.feature.home
 
 import SliderImage
 import android.app.Activity
+import android.content.Intent
+import android.net.Uri
+import android.os.Build
+import android.provider.Settings
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -32,15 +37,14 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Slider
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -61,18 +65,29 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import io.appmetrica.analytics.AppMetrica
 import ir.flyap.music_a.R
 import ir.flyap.music_a.main.navigation.NavigationState
 import ir.flyap.music_a.media.MediaViewModel
 import ir.flyap.music_a.model.Music
+import ir.flyap.music_a.ui.common.BaseTextButton
+import ir.flyap.music_a.ui.theme.ExitRed
+import ir.flyap.music_a.ui.theme.LargeSpacer
+import ir.flyap.music_a.ui.theme.MediumSpacer
 import ir.flyap.music_a.ui.theme.SmallSpacer
 import ir.flyap.music_a.ui.theme.dimension
+import ir.flyap.music_a.utill.Key
 import ir.flyap.music_a.utill.createImageBitmap
+import ir.flyap.music_a.utill.openBazaarComment
+import ir.flyap.music_a.utill.rememberPermissionState
 import ir.flyap.music_a.utill.shareFile
+import ir.flyap.music_a.utill.shareText
 import ir.flyap.music_a.utill.showToast
 import kotlinx.coroutines.launch
+import kotlin.system.exitProcess
 
 @Composable
 fun HomeScreen(
@@ -81,14 +96,69 @@ fun HomeScreen(
     homeViewModel: HomeViewModel = hiltViewModel()
 ) {
     val mediaState by mediaViewModel.state.collectAsStateWithLifecycle()
+    val homeState by homeViewModel.state.collectAsStateWithLifecycle()
+    var reqToExit by remember { mutableStateOf(false) }
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
+    val context = LocalContext.current
     val activity = LocalContext.current as Activity
 
-    DisposableEffect(Unit) {
-        onDispose {
-            // viewModel.destroyAd(context)
+    val permissionState = rememberPermissionState(
+        onGranted = {},
+        onDenied = {}
+    )
+
+
+    // Check Notification Permission
+    LaunchedEffect(key1 = Unit) {
+        if (homeState.showNotificationAlert) {
+            permissionState.requestNotification()
+            homeViewModel.hideNotificationAlert()
         }
+    }
+
+
+    // Check to show witch dialog
+    when (homeState.dialogKey) {
+
+        HomeDialogKey.AskRate -> {
+            homeViewModel.resetOpenAppCounter()
+            AskRateDialog(
+                reqToExit = reqToExit,
+                onDismissRequest = {
+                    reqToExit = false
+                    homeViewModel.setDialogKey(HomeDialogKey.Hide)
+                },
+                onYesClick = {
+                    homeViewModel.setDialogKey(HomeDialogKey.Hide)
+                    homeViewModel.hideCommentItem(Key.POSITIVE)
+                    context.showToast(R.string.support_by_5_star)
+                    context.openBazaarComment()
+                },
+                onNoClick = {
+                    homeViewModel.setDialogKey(HomeDialogKey.BadRate)
+                    homeViewModel.hideCommentItem(Key.NEGATIVE)
+                },
+                onExitClick = {
+                    exitProcess(0)
+                }
+            )
+        }
+
+        HomeDialogKey.BadRate -> {
+            BadRateDialog(
+                onDismissRequest = {
+                    homeViewModel.setDialogKey(HomeDialogKey.Hide)
+                },
+                action = {
+                    homeViewModel.setDialogKey(HomeDialogKey.Hide)
+                    AppMetrica.reportError("BadRate", it)
+                }
+            )
+        }
+
+        HomeDialogKey.Hide -> Unit
+
     }
 
     // show Ad
@@ -106,11 +176,31 @@ fun HomeScreen(
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
+            val context = LocalContext.current
             ModalDrawerSheet(
                 drawerShape = RectangleShape,
                 drawerContainerColor = MaterialTheme.colorScheme.background,
             ) {
-                DrawerItem(label = R.string.register, icon = ImageVector.vectorResource(R.drawable.ic_register), onClick = {})
+                HeaderDrawer()
+
+                // Invite Friends
+                DrawerItem(
+                    label = R.string.add_friend,
+                    icon = ImageVector.vectorResource(R.drawable.ic_person_add),
+                    onClick = {
+                        scope.launch { drawerState.close() }
+                        context.shareText(R.string.send_app_to_other)
+                    }
+                )
+
+                DrawerItem(
+                    label = R.string.submit_comment,
+                    icon = ImageVector.vectorResource(R.drawable.ic_comment),
+                    onClick = {
+                        scope.launch { drawerState.close() }
+                        homeViewModel.setDialogKey(HomeDialogKey.AskRate)
+                    }
+                )
 
                 DrawerItem(
                     label = R.string.about_us,
@@ -187,6 +277,28 @@ fun HomeScreen(
     }
 
 
+}
+
+@Composable
+fun HeaderDrawer() {
+    Column(
+        Modifier
+            .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.primary)
+            .padding(dimension.medium)
+    ) {
+        Image(
+            painter = painterResource(
+                id = R.drawable.ic_launcher_background
+            ),
+            contentDescription = null,
+            modifier = Modifier.size(75.dp)
+        )
+        SmallSpacer()
+        Text(text = stringResource(id = R.string.app_name), style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.onPrimary)
+        SmallSpacer()
+        Text(text = stringResource(id = R.string.drawer_desc), color = MaterialTheme.colorScheme.onPrimary)
+    }
 }
 
 @Composable
@@ -536,5 +648,119 @@ private fun DrawerItem(
         Text(text = stringResource(id = label), maxLines = 1, overflow = TextOverflow.Ellipsis, style = MaterialTheme.typography.titleSmall)
 
 
+    }
+}
+
+@Composable
+private fun AskRateDialog(
+    reqToExit: Boolean,
+    onDismissRequest: () -> Unit,
+    onYesClick: () -> Unit,
+    onNoClick: () -> Unit,
+    onExitClick: () -> Unit,
+) {
+    Dialog(onDismissRequest = onDismissRequest) {
+        Column(
+            Modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.surface, shape = MaterialTheme.shapes.small)
+                .padding(dimension.medium),
+        ) {
+
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    imageVector = ImageVector.vectorResource(R.drawable.ic_comment), contentDescription = "Comment", tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(30.dp)
+                )
+                SmallSpacer()
+                Text(
+                    text = stringResource(id = R.string.submit_comment),
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
+
+            SmallSpacer()
+
+            Text(text = stringResource(id = R.string.dialog_text_satisfied), color = MaterialTheme.colorScheme.onSurface)
+
+            LargeSpacer()
+
+
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+
+
+                if (reqToExit) {
+                    BaseTextButton(
+                        text = R.string.exit,
+                        contentColor = ExitRed,
+                        onclick = onExitClick
+                    )
+                } else
+                    MediumSpacer()
+
+
+
+                Row(verticalAlignment = Alignment.CenterVertically) {
+
+
+                    BaseTextButton(
+                        text = R.string.no,
+                        onclick = onNoClick
+                    )
+                    SmallSpacer()
+                    BaseTextButton(
+                        text = R.string.yes,
+                        onclick = onYesClick
+                    )
+
+                }
+
+
+            }
+        }
+    }
+}
+
+@Composable
+private fun BadRateDialog(
+    onDismissRequest: () -> Unit,
+    action: (String) -> Unit,
+) {
+    var text by remember { mutableStateOf("") }
+    Dialog(onDismissRequest = onDismissRequest) {
+        Column(
+            Modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.surface, shape = MaterialTheme.shapes.small)
+                .padding(dimension.medium),
+        ) {
+
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                Icon(imageVector = ImageVector.vectorResource(R.drawable.ic_comment), contentDescription = "", tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(30.dp))
+                SmallSpacer()
+                Text(
+                    text = stringResource(id = R.string.report),
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
+
+
+            SmallSpacer()
+
+            TextField(
+                value = text,
+                onValueChange = { text = it }
+            )
+
+            LargeSpacer()
+
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+                BaseTextButton(text = R.string.send, onclick = { action(text) })
+                SmallSpacer()
+                BaseTextButton(text = R.string.cancel, onclick = onDismissRequest)
+            }
+        }
     }
 }

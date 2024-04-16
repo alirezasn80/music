@@ -1,12 +1,17 @@
 package ir.flyap.music_a.feature.home
 
-import ir.flyap.music_a.model.Music
+
+sealed interface HomeDialogKey {
+    data object AskRate : HomeDialogKey
+    data object BadRate : HomeDialogKey
+    data object Hide : HomeDialogKey
+}
+
 
 data class HomeState(
-    val musics: List<Music> = emptyList(),
-    val categories: List<String> = emptyList(),
-    val currentMusic: Music? = null,
-    val currentProgress: Float = 0f,
-    val currentDuration: Long = 0L,
-    val isPlaying:Boolean =false,
+    val showComment: Boolean = true,
+    val openAppCount: Int = 0,
+    val dialogKey: HomeDialogKey = HomeDialogKey.Hide,
+    val needUpdate: Boolean = false,
+    val showNotificationAlert: Boolean = true
 )
