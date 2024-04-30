@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1053996495980",
+    "project_id": "musica-b0034",
+    "storage_bucket": "musica-b0034.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1053996495980:android:342a81895d9f4dc9fd5449",
+        "android_client_info": {
+          "package_name": "ir.flyap.music_a"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDwtgL4mfOSJo1LCUTkywPGO6b6VSBvwTo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
