@@ -38,7 +38,6 @@ fun SliderImage() {
   val imageList = remember {
       context.assets.list("slider")!!.toList().map { createImageBitmap(context, "slider/$it") }
   }
-    val sliderSize = rememberWindowSize().width
     val count = imageList.size
     val state = rememberPagerState(initialPage = 0, initialPageOffsetFraction = 0f) { imageList.size }
     val slideImage = remember { mutableStateOf(imageList[0]) }
@@ -50,7 +49,7 @@ fun SliderImage() {
             reverseLayout = true,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(150.dp)
+                .height(200.dp)
                 .padding(horizontal = dimension.medium)
                 .clip(MaterialTheme.shapes.small),
         ) { page ->

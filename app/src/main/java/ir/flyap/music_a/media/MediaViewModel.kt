@@ -11,6 +11,7 @@ import ir.flyap.music_a.model.Music
 import ir.flyap.music_a.repository.AudioRepository
 import ir.flyap.music_a.service.MediaPlayerService
 import ir.flyap.music_a.utill.BaseViewModel
+import ir.flyap.music_a.utill.debug
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.update
@@ -98,6 +99,7 @@ class MediaViewModel @Inject constructor(
             repository.getAllMusic(
                 onSuccess = { items ->
                     state.update { it.copy(musics = items) }
+
                 },
                 onError = {
                     setMessageByToast(R.string.unknown_error)

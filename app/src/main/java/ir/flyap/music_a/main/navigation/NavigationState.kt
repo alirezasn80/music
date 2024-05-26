@@ -33,7 +33,9 @@ class NavigationState(
 
     fun navToOffline() = navController.navigate(Screen.Offline.route) { popUpTo(0) }
 
-    fun navToAboutUs() = navController.navigate(Screen.AboutUs.route)
+    fun navToAboutSinger() = navController.navigate(Screen.AboutSinger.route)
+
+    fun navToAboutFan(id:Int) = navController.navigate(Screen.AboutFan.route(id))
 
     fun navToDetail() = navController.navigate(Screen.Detail.route)
 
@@ -41,7 +43,7 @@ class NavigationState(
 
     fun navToStories(categoryId: Int, title: String) = navController.navigate(Screen.Stories.route(categoryId, title))
 
-    fun navToContent(categoryId: Int, contentId:Int) = navController.navigate(Screen.Content.route(categoryId, contentId))
+    fun navToContent(categoryId: Int, contentId: Int) = navController.navigate(Screen.Content.route(categoryId, contentId))
 
     fun navToOnBoarding() = navController.navigate(Screen.OnBoarding.route) { popUpTo(0) }
 

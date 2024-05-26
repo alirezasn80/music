@@ -59,7 +59,9 @@ constructor(
 
             }
             onSuccess(music)
+
         } catch (e: Exception) {
+            debug("error read musics : ${e.message}")
             AppMetrica.reportError("Error in get all musics", e)
             onError(e)
         } finally {
@@ -122,9 +124,13 @@ constructor(
         onError: (Exception) -> Unit
     ) {
         try {
-            val albums = mutableListOf("همه")
-            albums.addAll(db.musicDao.getCategoriesByAlbum().filterNotNull())
-            onSuccess(albums)
+            val albums = mutableListOf<String>()
+            albums.addAll(db.musicDao.getCategoriesByAlbum().filter { it.isNotBlank() })
+            debug("album : ${albums.toString()}")
+            if (albums.isNotEmpty()) {
+                albums.add(0, "همه")
+                onSuccess(albums)
+            }
         } catch (e: Exception) {
             AppMetrica.reportError("Error in get Categories(Albums)", e)
             onError(e)

@@ -1,19 +1,15 @@
 package ir.flyap.music_a.feature.home
 
-import SliderImage
 import android.app.Activity
-import android.content.Intent
-import android.net.Uri
-import android.os.Build
-import android.provider.Settings
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,6 +21,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -42,7 +39,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -52,6 +48,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.painter.Painter
@@ -75,13 +72,18 @@ import ir.flyap.music_a.media.MediaViewModel
 import ir.flyap.music_a.model.Music
 import ir.flyap.music_a.ui.common.BaseTextButton
 import ir.flyap.music_a.ui.theme.ExitRed
+import ir.flyap.music_a.ui.theme.ExtraSmallSpacer
 import ir.flyap.music_a.ui.theme.LargeSpacer
 import ir.flyap.music_a.ui.theme.MediumSpacer
+import ir.flyap.music_a.ui.theme.Red100
+import ir.flyap.music_a.ui.theme.Red20
 import ir.flyap.music_a.ui.theme.SmallSpacer
 import ir.flyap.music_a.ui.theme.dimension
 import ir.flyap.music_a.utill.Key
 import ir.flyap.music_a.utill.createImageBitmap
+import ir.flyap.music_a.utill.debug
 import ir.flyap.music_a.utill.openBazaarComment
+import ir.flyap.music_a.utill.openBrowser
 import ir.flyap.music_a.utill.rememberPermissionState
 import ir.flyap.music_a.utill.shareFile
 import ir.flyap.music_a.utill.shareText
@@ -176,7 +178,7 @@ fun HomeScreen(
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
-            val context = LocalContext.current
+
             ModalDrawerSheet(
                 drawerShape = RectangleShape,
                 drawerContainerColor = MaterialTheme.colorScheme.background,
@@ -203,9 +205,19 @@ fun HomeScreen(
                 )
 
                 DrawerItem(
+                    label = R.string.about_singer,
+                    icon = ImageVector.vectorResource(R.drawable.ic_about_singer),
+                    onClick = {
+                        navigationState.navToAboutSinger()
+                    }
+                )
+
+                DrawerItem(
                     label = R.string.about_us,
                     icon = ImageVector.vectorResource(R.drawable.ic_about),
-                    onClick = {}
+                    onClick = {
+                        context.openBrowser("https://www.flyap.ir")
+                    }
                 )
             }
         }
@@ -233,7 +245,11 @@ fun HomeScreen(
                     }
 
                     Text(
-                        text = "آهنگ های مشت", style = MaterialTheme.typography.titleSmall, modifier = Modifier.align(Alignment.Center)
+                        text = "آهنگ های محمدرضا گلزار",
+                        style = MaterialTheme.typography.titleSmall,
+                        modifier = Modifier
+                            .align(Alignment.Center)
+                            .clickable { navigationState.navToAboutSinger() }
                     )
                 }
 
@@ -245,8 +261,12 @@ fun HomeScreen(
                     .fillMaxSize()
                     .padding(paddingValues)
             ) {
-                SmallSpacer()
-                SliderImage()
+                FansList(
+                    fans = homeState.fans,
+                    onClick = {
+                        navigationState.navToAboutFan(it)
+                    }
+                )
                 AlbumBar(
                     items = mediaState.categories,
                     onAlbumClick = mediaViewModel::onAlbumClick
@@ -280,6 +300,35 @@ fun HomeScreen(
 }
 
 @Composable
+fun FansList(
+    fans: List<FanModel>,
+    onClick: (Int) -> Unit
+) {
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .horizontalScroll(rememberScrollState())
+            .padding(horizontal = dimension.medium),
+        horizontalArrangement = Arrangement.spacedBy(dimension.small)
+    ) {
+        fans.forEach {
+            Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.clickable { onClick(it.id) }) {
+                Image(
+                    painter = painterResource(id = it.img),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .clip(CircleShape)
+                        .size(60.dp)
+                        .border(1.dp, Brush.linearGradient(listOf(Red100, Red20, Red100)), CircleShape)
+                )
+                ExtraSmallSpacer()
+                Text(text = it.name)
+            }
+        }
+    }
+}
+
+@Composable
 fun HeaderDrawer() {
     Column(
         Modifier
@@ -289,13 +338,13 @@ fun HeaderDrawer() {
     ) {
         Image(
             painter = painterResource(
-                id = R.drawable.ic_launcher_background
+                id = R.drawable.img_logo
             ),
             contentDescription = null,
-            modifier = Modifier.size(75.dp)
+            modifier = Modifier
+                .clip(CircleShape)
+                .size(75.dp)
         )
-        SmallSpacer()
-        Text(text = stringResource(id = R.string.app_name), style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.onPrimary)
         SmallSpacer()
         Text(text = stringResource(id = R.string.drawer_desc), color = MaterialTheme.colorScheme.onPrimary)
     }
@@ -351,6 +400,7 @@ private fun AlbumBar(
     items: List<String>,
     onAlbumClick: (String) -> Unit
 ) {
+    debug(items.toString())
     if (items.isNotEmpty())
         Row(
             Modifier

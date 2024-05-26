@@ -8,6 +8,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import dagger.hilt.android.AndroidEntryPoint
+import ir.flyap.music_a.feature.about_fan.AboutFanScreen
+import ir.flyap.music_a.feature.about_singer.AboutSingerScreen
 import ir.flyap.music_a.feature.detail.DetailScreen
 import ir.flyap.music_a.feature.home.HomeScreen
 import ir.flyap.music_a.media.MediaViewModel
@@ -21,7 +23,7 @@ import ir.flyap.music_a.utill.debug
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-    private  var mediaViewModel: MediaViewModel? =null
+    private var mediaViewModel: MediaViewModel? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,7 +37,7 @@ class MainActivity : ComponentActivity() {
             MusicTheme {
                 NavHost(
                     navController = navigationState.navController,
-                    startDestination = Screen.Splash.route,
+                    startDestination = Screen.Home.route,
                 ) {
 
                     composable(Screen.Splash.route) {
@@ -56,6 +58,14 @@ class MainActivity : ComponentActivity() {
                         )
                     }
 
+                    composable(Screen.AboutSinger.route) {
+                        AboutSingerScreen(navigationState::upPress)
+                    }
+
+                    composable(Screen.AboutFan.route) {
+                        AboutFanScreen(navigationState::upPress)
+                    }
+
                 }
             }
         }
@@ -63,27 +73,27 @@ class MainActivity : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
-        debug("onResume")
+
     }
 
     override fun onStop() {
         super.onStop()
-        debug("onStop")
+
     }
 
     override fun onPause() {
         super.onPause()
-        debug("onPause")
+
     }
 
     override fun onStart() {
         super.onStart()
-        debug("onStart")
+
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        debug("onDestroy")
+
     }
 
 }

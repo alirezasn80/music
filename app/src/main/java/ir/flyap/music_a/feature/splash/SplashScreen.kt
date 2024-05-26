@@ -1,18 +1,23 @@
 package ir.flyap.music_a.feature.splash
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Text
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import ir.flyap.music_a.R
 import ir.flyap.music_a.main.navigation.NavigationState
 import ir.flyap.music_a.utill.Destination
-import kotlinx.coroutines.delay
 
 
 @Composable
@@ -31,6 +36,10 @@ fun SplashScreen(navigationState: NavigationState, viewModel: SplashViewModel = 
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
-        Text(text = "Splash")
+        Image(
+            painter = painterResource(id = R.drawable.img_logo),
+            contentDescription = null,
+            modifier = Modifier.clip(CircleShape).size(200.dp)
+        )
     }
 }

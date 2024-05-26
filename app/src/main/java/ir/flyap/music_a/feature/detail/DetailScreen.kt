@@ -235,10 +235,6 @@ fun BottomMediaBar(
             currentProgress = progress
     }
 
-    LaunchedEffect(isDragging) {
-        debug("dragging : $isDragging")
-    }
-
     Column(
         Modifier
             .fillMaxWidth()

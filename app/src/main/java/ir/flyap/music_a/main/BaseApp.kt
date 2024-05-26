@@ -25,14 +25,14 @@ class BaseApp : Application() {
     private fun initializeTapsell() {
         TapsellPlus.initialize(this, Tapsell.ApiKey, object : TapsellPlusInitListener {
             override fun onInitializeSuccess(adNetworks: AdNetworks) {
-                debug("onInitializeSuccess")
+
             }
 
             override fun onInitializeFailed(
                 adNetworks: AdNetworks,
                 adNetworkError: AdNetworkError
             ) {
-                debug("onInitializeFailed")
+
             }
         })
         TapsellPlus.setGDPRConsent(this, true)

@@ -161,3 +161,17 @@ fun Context.openBazaarComment() {
     }
 
 }
+
+
+fun Context.openBrowser(url:String) {
+    try {
+        val webpage: Uri = Uri.parse(url)
+        val intent = Intent(Intent.ACTION_VIEW, webpage)
+
+        startActivity(intent)
+    } catch (e: Exception) {
+        AppMetrica.reportError("Error : Open Browser", e)
+    }
+
+}
+

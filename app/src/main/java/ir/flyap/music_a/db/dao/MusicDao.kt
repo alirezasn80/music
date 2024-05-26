@@ -20,7 +20,7 @@ interface MusicDao {
     suspend fun getAllMusic(): List<MusicEntity>
 
     @Query("SELECT album FROM MusicEntity group by album")
-    suspend fun getCategoriesByAlbum(): List<String?>
+    suspend fun getCategoriesByAlbum(): List<String>
 
     @Query("SELECT * FROM MusicEntity WHERE title LIKE :title")
     suspend fun searchMusic(title: String): List<MusicEntity>

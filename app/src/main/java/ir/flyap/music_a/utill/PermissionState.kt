@@ -20,6 +20,7 @@ fun rememberPermissionState(
 
 
     val launcher = rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissionsMap ->
+        if (permissionsMap.values.isEmpty()) return@rememberLauncherForActivityResult
         val areGranted = permissionsMap.values.reduce { acc, next -> acc && next }
         if (areGranted) {
             onGranted()
