@@ -1,3 +1,8 @@
 package ir.flyap.music_a.feature.about_fan
 
-data class AboutFanState(val i:Int = 12)
+import ir.flyap.music_a.api.service.FanInfoModel
+
+data class AboutFanState(
+    val isLoading: Boolean = true,
+    val data: FanInfoModel? = null,
+)

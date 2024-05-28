@@ -1,21 +1,25 @@
 package ir.flyap.music_a.feature.home
 
 import android.app.Activity
+import android.app.Application
 import android.view.ViewGroup
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import ir.flyap.music_a.api.service.ApiService
 import ir.flyap.music_a.cache.datastore.DataStore
 import ir.flyap.music_a.tapsell.Tapsell
 import ir.flyap.music_a.utill.BaseViewModel
 import ir.flyap.music_a.utill.Key
 import ir.flyap.music_a.utill.debug
+import ir.flyap.music_a.utill.isOnline
 import ir.tapsell.plus.AdRequestCallback
 import ir.tapsell.plus.AdShowListener
 import ir.tapsell.plus.TapsellPlus
 import ir.tapsell.plus.TapsellPlusBannerType
 import ir.tapsell.plus.model.TapsellPlusAdModel
 import ir.tapsell.plus.model.TapsellPlusErrorModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -23,6 +27,8 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val dataStore: DataStore,
+    private val context: Application,
+    private val apiService: ApiService,
 ) : BaseViewModel<HomeState>(HomeState()) {
     private var standardResponseId: String? = null
     private var interstitialResponseId: String? = null
@@ -34,6 +40,25 @@ class HomeViewModel @Inject constructor(
         checkUpdate()
         openAppCounter()
         getCommentStatus()
+        if (isOnline(context))
+            getFans()
+        else{
+            debug("not online")
+        }
+    }
+
+    private fun getFans() {
+        debug("get fans")
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val fans = apiService.getFans()
+                debug("fans : $fans")
+                state.update { it.copy(fans = fans) }
+            } catch (e: Exception) {
+                debug("error : ${e.message}")
+                e.printStackTrace()
+            }
+        }
     }
 
     fun hideNotificationAlert() = state.update { it.copy(showNotificationAlert = false) }
@@ -92,9 +117,6 @@ class HomeViewModel @Inject constructor(
             state.update { it.copy(openAppCount = 0) }
         }
     }
-
-
-
 
 
     fun requestStandardAd(

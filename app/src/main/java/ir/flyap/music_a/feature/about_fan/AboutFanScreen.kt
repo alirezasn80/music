@@ -18,97 +18,113 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowForward
 import androidx.compose.material.icons.rounded.Face
 import androidx.compose.material.icons.rounded.Home
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil.annotation.ExperimentalCoilApi
 import ir.flyap.music_a.R
 import ir.flyap.music_a.ui.theme.MediumSpacer
 import ir.flyap.music_a.ui.theme.SmallSpacer
 import ir.flyap.music_a.ui.theme.dimension
+import ir.flyap.music_a.utill.CoilImage
 
+@OptIn(ExperimentalCoilApi::class)
 @Composable
-fun AboutFanScreen(upPress: () -> Unit) {
-    Column(
-        Modifier
-            .fillMaxSize(),
-    ) {
-        Row(
-            Modifier
-                .fillMaxWidth()
-                .padding(dimension.medium), verticalAlignment = Alignment.CenterVertically
+fun AboutFanScreen(upPress: () -> Unit, viewModel: AboutFanViewModel = hiltViewModel()) {
+    val state by viewModel.state.collectAsStateWithLifecycle()
+    if (state.isLoading) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
         ) {
-            Icon(imageVector = Icons.Rounded.ArrowForward, contentDescription = null, modifier = Modifier.clickable { upPress() })
-            SmallSpacer()
-            Text(text = "درباره خواننده")
+            CircularProgressIndicator()
         }
+    } else {
+        if (state.data == null) return
         Column(
             Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState()),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .fillMaxSize(),
         ) {
-
-            MediumSpacer()
-
-            Image(
-                painter = painterResource(id = R.drawable.img_logo),
-                contentDescription = null,
-                modifier = Modifier
-                    .clip(CircleShape)
-                    .size(100.dp)
-            )
-            SmallSpacer()
-            Text(text = "چغوت نارنگی", style = MaterialTheme.typography.titleSmall)
-            MediumSpacer()
-            Column(
-                Modifier
-                    .fillMaxWidth()
-                    .padding(dimension.medium)
-                    .background(MaterialTheme.colorScheme.secondary.copy(alpha = 0.8f), MaterialTheme.shapes.small)
-                    .padding(dimension.medium)
-            ) {
-                Text(text = "توضیحات", style = MaterialTheme.typography.titleSmall)
-                SmallSpacer()
-                Text(text = "یه متن چرت پرت که هییج ارزش خوندن نداره. و الان تویی که داری میخونی داری الکی وقتتو برای خواندن این متن هدر میدی. هیچ وقت دیگه این کار رو نکن و همین الان ادامه نده. دیگه این متن بی ارزش تستی رو نخون. منم مجبور بودم برا تست این متن رو بنویسم. پس تو نخون. فقط متن رو ببین. همین. فقط دیدن بدون مفهوم. این متن قراره اطلاعات یه فن پیج نمایش داده بشه. شاید اطلاعات تو باشه. که اون موقع این اطلاعات با ارزش میشه. چون تویی که داری این متن رو میخونی با ارزشی .")
-            }
-            MediumSpacer()
             Row(
                 Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = dimension.medium), horizontalArrangement = Arrangement.SpaceBetween
+                    .padding(dimension.medium), verticalAlignment = Alignment.CenterVertically
             ) {
-                Row(
-                    Modifier
-                        .background(MaterialTheme.colorScheme.secondary, MaterialTheme.shapes.medium)
-                        .padding(dimension.medium),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-
-                    Text(text = "telegram")
-                    SmallSpacer()
-                    Icon(imageVector = Icons.Rounded.Home, contentDescription = null)
-
-                }
-
-                Row(
-                    Modifier
-                        .background(MaterialTheme.colorScheme.secondary, MaterialTheme.shapes.medium)
-
-                        .padding(dimension.medium),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(text = "instagram")
-                    SmallSpacer()
-                    Icon(imageVector = Icons.Rounded.Face, contentDescription = null)
-                }
+                Icon(imageVector = Icons.Rounded.ArrowForward, contentDescription = null, modifier = Modifier.clickable { upPress() })
+                SmallSpacer()
+                Text(text = "درباره خواننده")
             }
+            Column(
+                Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState()),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
 
+                MediumSpacer()
+
+                CoilImage(
+                    modifier = Modifier
+                        .clip(CircleShape)
+                        .size(100.dp), data = state.data!!.profile
+                )
+                SmallSpacer()
+                Text(text = state.data!!.name, style = MaterialTheme.typography.titleSmall)
+                MediumSpacer()
+                Column(
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(dimension.medium)
+                        .background(MaterialTheme.colorScheme.secondary.copy(alpha = 0.8f), MaterialTheme.shapes.small)
+                        .padding(dimension.medium)
+                ) {
+                    Text(text = "توضیحات", style = MaterialTheme.typography.titleSmall)
+                    SmallSpacer()
+                    Text(text = state.data!!.description)
+                }
+                MediumSpacer()
+                Row(
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = dimension.medium), horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    if (state.data!!.telegram != null)
+                        Row(
+                            Modifier
+                                .background(MaterialTheme.colorScheme.secondary, MaterialTheme.shapes.medium)
+                                .padding(dimension.medium),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(text = state.data!!.telegram!!)
+                            SmallSpacer()
+                            Icon(imageVector = Icons.Rounded.Home, contentDescription = null)
+                        } else
+                        SmallSpacer()
+
+                    Row(
+                        Modifier
+                            .background(MaterialTheme.colorScheme.secondary, MaterialTheme.shapes.medium)
+
+                            .padding(dimension.medium),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(text = "instagram")
+                        SmallSpacer()
+                        Icon(imageVector = Icons.Rounded.Face, contentDescription = null)
+                    }
+                }
+
+            }
         }
     }
 }

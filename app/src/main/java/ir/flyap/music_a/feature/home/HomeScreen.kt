@@ -65,8 +65,10 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil.annotation.ExperimentalCoilApi
 import io.appmetrica.analytics.AppMetrica
 import ir.flyap.music_a.R
+import ir.flyap.music_a.api.service.FanModel
 import ir.flyap.music_a.main.navigation.NavigationState
 import ir.flyap.music_a.media.MediaViewModel
 import ir.flyap.music_a.model.Music
@@ -79,6 +81,7 @@ import ir.flyap.music_a.ui.theme.Red100
 import ir.flyap.music_a.ui.theme.Red20
 import ir.flyap.music_a.ui.theme.SmallSpacer
 import ir.flyap.music_a.ui.theme.dimension
+import ir.flyap.music_a.utill.CoilImage
 import ir.flyap.music_a.utill.Key
 import ir.flyap.music_a.utill.createImageBitmap
 import ir.flyap.music_a.utill.debug
@@ -261,12 +264,13 @@ fun HomeScreen(
                     .fillMaxSize()
                     .padding(paddingValues)
             ) {
-                FansList(
-                    fans = homeState.fans,
-                    onClick = {
-                        navigationState.navToAboutFan(it)
-                    }
-                )
+                if (homeState.fans != null)
+                    FansList(
+                        fans = homeState.fans!!,
+                        onClick = {
+                            navigationState.navToAboutFan(it)
+                        }
+                    )
                 AlbumBar(
                     items = mediaState.categories,
                     onAlbumClick = mediaViewModel::onAlbumClick
@@ -299,9 +303,10 @@ fun HomeScreen(
 
 }
 
+@OptIn(ExperimentalCoilApi::class)
 @Composable
 fun FansList(
-    fans: List<FanModel>,
+    fans: FanModel,
     onClick: (Int) -> Unit
 ) {
     Row(
@@ -311,18 +316,16 @@ fun FansList(
             .padding(horizontal = dimension.medium),
         horizontalArrangement = Arrangement.spacedBy(dimension.small)
     ) {
-        fans.forEach {
+        fans.data.forEach {
             Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.clickable { onClick(it.id) }) {
-                Image(
-                    painter = painterResource(id = it.img),
-                    contentDescription = null,
+                CoilImage(
                     modifier = Modifier
                         .clip(CircleShape)
                         .size(60.dp)
-                        .border(1.dp, Brush.linearGradient(listOf(Red100, Red20, Red100)), CircleShape)
+                        .border(1.dp, Brush.linearGradient(listOf(Red100, Red20, Red100)), CircleShape), data = it.profile
                 )
                 ExtraSmallSpacer()
-                Text(text = it.name)
+                Text(text = it.fanName)
             }
         }
     }

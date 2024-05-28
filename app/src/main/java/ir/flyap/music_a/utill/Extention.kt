@@ -13,11 +13,17 @@ import androidx.core.content.FileProvider
 import io.appmetrica.analytics.AppMetrica
 import ir.flyap.music_a.R
 import ir.flyap.music_a.model.Music
+import okhttp3.Interceptor
+import okio.Buffer
+import okio.GzipSource
+import org.json.JSONObject
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
+import java.nio.charset.Charset
+import java.util.concurrent.TimeUnit
 import kotlin.math.floor
 
 
@@ -173,5 +179,99 @@ fun Context.openBrowser(url:String) {
         AppMetrica.reportError("Error : Open Browser", e)
     }
 
+}
+
+fun logging() = Interceptor { chain ->
+    val message = StringBuilder()
+    val headersToRedact = emptySet<String>()
+    val request = chain.request()
+    val startNs = System.nanoTime()
+    val response = chain.proceed(request)
+    val tookMs = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startNs)
+    val seconds = tookMs / 1000
+    val millis = tookMs % 1000
+    val time = "${if (seconds.toInt() == 0) "" else "${seconds}S and "}${millis}MS"
+    val url = request.url
+    val code = response.code
+    val responseBody = response.body!!
+    val contentLength = responseBody.contentLength()
+
+
+    val headers = response.headers
+    for (i in 0 until headers.size)
+        if (headers.name(i) !in headersToRedact) headers.value(i)
+
+
+    val source = responseBody.source()
+    source.request(Long.MAX_VALUE) // Buffer the entire body.
+    var buffer = source.buffer
+
+
+    if ("gzip".equals(headers["Content-Encoding"], ignoreCase = true)) {
+        GzipSource(buffer.clone()).use { gzippedResponseBody ->
+            buffer = Buffer()
+            buffer.writeAll(gzippedResponseBody)
+        }
+    }
+
+    val charset: Charset = responseBody.contentType()?.charset() ?: Charsets.UTF_8
+
+    if (contentLength != 0L) {
+        val body = buffer.clone().readString(charset)
+
+        if (url.toString().contains(".png").not()) {
+
+            message.append("START(url:$url, code:$code) \n")
+            try {
+
+                val indentSize = 2
+                var indentation = 0
+
+                /* for (char in body) {
+                     when (char) {
+                         '{', '[' -> {
+                             message.append(char)
+                             message.append("\n")
+                             indentation += indentSize
+                             message.append(" ".repeat(indentation))
+                         }
+
+                         '}', ']' -> {
+                             message.append("\n")
+                             indentation -= indentSize
+                             message.append(" ".repeat(indentation))
+                             message.append(char)
+                         }
+
+                         ',' -> {
+                             message.append(char)
+                             message.append("\n")
+                             message.append(" ".repeat(indentation))
+                         }
+
+                         else -> {
+                             message.append(char)
+                         }
+
+                     }
+                 }*/
+
+                message.append(JSONObject(body).toString(4))
+
+
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+            message.append("\n-------------------  END ($time)  -------------------")
+
+
+
+            debug(message.toString(), "Retrofit")
+        }
+    }
+
+
+
+    response
 }
 

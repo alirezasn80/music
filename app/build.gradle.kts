@@ -117,4 +117,15 @@ dependencies {
     implementation("io.appmetrica.analytics:analytics:6.1.0")
     implementation("io.appmetrica.analytics:push:3.0.0")
     implementation("androidx.legacy:legacy-support-v4:1.0.0")
+
+    //retrofit
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+
+    //okhttp
+    implementation("com.squareup.okhttp3:okhttp:5.0.0-alpha.6")
+    implementation("com.squareup.okhttp3:logging-interceptor:5.0.0-alpha.6")
+
+    //coil
+    implementation("io.coil-kt:coil-compose:2.5.0")
 }
