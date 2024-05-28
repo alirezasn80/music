@@ -59,9 +59,18 @@
 -dontwarn com.unity3d.services.banners.BannerView$IListener
 -dontwarn com.unity3d.services.banners.BannerView
 -dontwarn com.unity3d.services.banners.UnityBannerSize
+-dontwarn com.oracle.svm.core.annotate.AutomaticFeature
+-dontwarn com.oracle.svm.core.annotate.Delete
+-dontwarn com.oracle.svm.core.annotate.Substitute
+-dontwarn com.oracle.svm.core.annotate.TargetClass
+-dontwarn com.oracle.svm.core.configure.ResourcesRegistry
+-dontwarn org.graalvm.nativeimage.ImageSingletons
+-dontwarn org.graalvm.nativeimage.hosted.Feature$BeforeAnalysisAccess
+-dontwarn org.graalvm.nativeimage.hosted.Feature
 
 #Retrofit Rules
 -dontnote retrofit2.Platform
 -keepattributes Signature
 -keepattributes Exceptions
 -dontwarn kotlinx.coroutines.**
+
