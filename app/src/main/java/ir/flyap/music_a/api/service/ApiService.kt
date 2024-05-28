@@ -5,7 +5,6 @@ import com.google.gson.annotations.SerializedName
 import retrofit2.http.GET
 import retrofit2.http.Path
 
-
 @Keep
 data class FanModel(
     @SerializedName("data")
@@ -22,6 +21,7 @@ data class FanItem(
     val profile: String
 )
 
+@Keep
 data class FanInfoModel(
     val id: Int,
     @SerializedName("fan_name")
@@ -34,11 +34,9 @@ data class FanInfoModel(
 
 
 interface ApiService {
-
     @GET("fanpages")
     suspend fun getFans(): FanModel
 
     @GET("fanpages_info/{id}")
     suspend fun getFanInfo(@Path("id") id: Int): FanInfoModel
-
 }

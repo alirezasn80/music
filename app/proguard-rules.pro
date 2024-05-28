@@ -59,3 +59,9 @@
 -dontwarn com.unity3d.services.banners.BannerView$IListener
 -dontwarn com.unity3d.services.banners.BannerView
 -dontwarn com.unity3d.services.banners.UnityBannerSize
+
+#Retrofit Rules
+-dontnote retrofit2.Platform
+-keepattributes Signature
+-keepattributes Exceptions
+-dontwarn kotlinx.coroutines.**
