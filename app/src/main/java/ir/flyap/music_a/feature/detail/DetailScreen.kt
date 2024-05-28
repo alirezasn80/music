@@ -69,12 +69,14 @@ import ir.flyap.music_a.utill.createImageBitmap
 import ir.flyap.music_a.utill.debug
 import ir.flyap.music_a.utill.timeStampToDuration
 
+
 @Composable
 fun DetailScreen(
     navigationState: NavigationState,
     mediaViewModel: MediaViewModel,
     detailViewModel: DetailViewModel = hiltViewModel()
 ) {
+
     val mediaState by mediaViewModel.state.collectAsStateWithLifecycle()
     val detailState by detailViewModel.state.collectAsStateWithLifecycle()
     var selectedFrame by remember { mutableStateOf("cover") }

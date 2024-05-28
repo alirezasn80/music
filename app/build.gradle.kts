@@ -71,6 +71,7 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.firebase.messaging.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -116,8 +117,4 @@ dependencies {
     implementation("io.appmetrica.analytics:analytics:6.1.0")
     implementation("io.appmetrica.analytics:push:3.0.0")
     implementation("androidx.legacy:legacy-support-v4:1.0.0")
-
-    // Firebase
-    implementation(libs.firebase.messaging)
-
 }
