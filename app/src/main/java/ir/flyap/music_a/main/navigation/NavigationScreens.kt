@@ -28,6 +28,8 @@ sealed class Screen(val route: String) {
 
     data object AboutSinger : Screen("AboutSinger")
 
+    data object AboutUs : Screen("AboutUs")
+
     data object AboutFan : Screen("AboutFan/{${Arg.FAN_ID}}")
 
     data object Payment : Screen("Payment/{${Arg.Key}}")

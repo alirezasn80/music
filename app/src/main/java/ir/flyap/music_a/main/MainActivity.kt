@@ -10,6 +10,7 @@ import androidx.navigation.compose.composable
 import dagger.hilt.android.AndroidEntryPoint
 import ir.flyap.music_a.feature.about_fan.AboutFanScreen
 import ir.flyap.music_a.feature.about_singer.AboutSingerScreen
+import ir.flyap.music_a.feature.about_us.AboutUsScreen
 import ir.flyap.music_a.feature.detail.DetailScreen
 import ir.flyap.music_a.feature.home.HomeScreen
 import ir.flyap.music_a.media.MediaViewModel
@@ -64,6 +65,10 @@ class MainActivity : ComponentActivity() {
 
                     composable(Screen.AboutFan.route) {
                         AboutFanScreen(navigationState::upPress)
+                    }
+
+                    composable(Screen.AboutUs.route) {
+                        AboutUsScreen(navigationState::upPress)
                     }
 
                 }

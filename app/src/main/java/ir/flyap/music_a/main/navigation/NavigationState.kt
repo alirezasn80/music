@@ -35,7 +35,9 @@ class NavigationState(
 
     fun navToAboutSinger() = navController.navigate(Screen.AboutSinger.route)
 
-    fun navToAboutFan(id:Int) = navController.navigate(Screen.AboutFan.route(id))
+    fun navToAboutUs() = navController.navigate(Screen.AboutUs.route)
+
+    fun navToAboutFan(id: Int) = navController.navigate(Screen.AboutFan.route(id))
 
     fun navToDetail() = navController.navigate(Screen.Detail.route)
 

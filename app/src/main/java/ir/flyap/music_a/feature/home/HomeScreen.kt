@@ -219,7 +219,7 @@ fun HomeScreen(
                     label = R.string.about_us,
                     icon = ImageVector.vectorResource(R.drawable.ic_about),
                     onClick = {
-                        context.openBrowser("https://www.flyap.ir")
+                        navigationState.navToAboutUs()
                     }
                 )
             }
