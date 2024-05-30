@@ -30,11 +30,11 @@ fun AboutUsScreen(upPress: () -> Unit) {
         Text(text = stringResource(id = R.string.about_us_text))
         MediumSpacer()
         TextButton(onClick = { context.openBrowser("https://www.flyap.ir") }) {
-            Text(text = "https://www.flyap.ir", color = MaterialTheme.colorScheme.primary)
+            Text(text = "آدرس وب سایت شرکت : flyap.ir", color = MaterialTheme.colorScheme.primary)
         }
         MediumSpacer()
-        Text(text = "منابع استفاده شده:")
+        Text(text = "منبع موزیک ها")
         ExtraSmallSpacer()
-        Text(text = "https://nicmusic.net/")
+        Text(text = "نیک موزیک")
     }
 }
