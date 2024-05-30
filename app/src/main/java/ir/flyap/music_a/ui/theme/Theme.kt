@@ -29,14 +29,14 @@ private val DarkColorScheme = darkColorScheme(
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = OrangeTopBar,
-    secondary = OrangeDrawer,
-    background = Color(0xFFF5FCF1),
-    onBackground = BlackOnBackground,
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    surface = Color(0xFFA3B49A),
-    onSurface = BlackOnBackground
+    primary = Color(0xFFE3B04B),
+    secondary = Color(0xFFF1D6AB),
+    background = Color(0xFF2B2B28),
+    onBackground = Color(0xFFF8F8F8),
+    onPrimary = Color(0xFFF8F8F8),
+    onSecondary = Color(0xFFF8F8F8),
+    surface = Color(0xFF1A1C20),
+    onSurface = Color(0xFFF8F8F8)
 )
 
 
@@ -48,15 +48,15 @@ fun MusicTheme(
     content: @Composable () -> Unit
 ) {
     val colorScheme = LightColorScheme
-        /*when {
-        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-        }
+    /*when {
+    dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
+        val context = LocalContext.current
+        if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+    }
 
-        darkTheme -> DarkColorScheme
-        else -> LightColorScheme
-    }*/
+    darkTheme -> DarkColorScheme
+    else -> LightColorScheme
+}*/
     val view = LocalView.current
     if (!view.isInEditMode) {
         SideEffect {

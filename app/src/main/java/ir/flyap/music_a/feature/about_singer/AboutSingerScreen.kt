@@ -1,6 +1,7 @@
 package ir.flyap.music_a.feature.about_singer
 
 import SliderImage
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -32,6 +33,7 @@ fun AboutSingerScreen(upPress: () -> Unit) {
     Column(
         Modifier
             .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
             .verticalScroll(rememberScrollState())
     ) {
         Row(
@@ -40,9 +42,14 @@ fun AboutSingerScreen(upPress: () -> Unit) {
                 .padding(dimension.medium), verticalAlignment = Alignment.CenterVertically
         ) {
 
-            Icon(imageVector = Icons.Rounded.ArrowForward, contentDescription = null, modifier = Modifier.clickable { upPress() })
+            Icon(
+                imageVector = Icons.Rounded.ArrowForward,
+                contentDescription = null,
+                modifier = Modifier.clickable { upPress() },
+                tint = MaterialTheme.colorScheme.onBackground
+            )
             SmallSpacer()
-            Text(text = "درباره خواننده")
+            Text(text = "درباره خواننده", color = MaterialTheme.colorScheme.onBackground)
 
         }
         SmallSpacer()
@@ -55,7 +62,8 @@ fun AboutSingerScreen(upPress: () -> Unit) {
             Text(
                 text = stringResource(id = R.string.about_singer_full_text),
                 letterSpacing = 2.sp,
-                lineHeight = 28.sp
+                lineHeight = 28.sp,
+                color = MaterialTheme.colorScheme.onBackground
             )
             MediumSpacer()
             Text(

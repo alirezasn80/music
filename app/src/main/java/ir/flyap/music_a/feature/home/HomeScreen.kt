@@ -653,7 +653,9 @@ private fun BottomBarPlayer(
             .padding(dimension.small)
             .clip(MaterialTheme.shapes.medium)
             .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.secondary, RoundedCornerShape(topEnd = 5.dp, topStart = 5.dp))
+            .background(
+                MaterialTheme.colorScheme.surface,
+                RoundedCornerShape(topEnd = 5.dp, topStart = 5.dp))
             .clickable { onclick() }
             .padding(horizontal = dimension.medium, vertical = dimension.medium),
         verticalAlignment = Alignment.CenterVertically

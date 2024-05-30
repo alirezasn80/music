@@ -114,7 +114,7 @@ fun DetailScreen(
                 Modifier
                     .fillMaxSize()
                     .padding(scaffoldPadding)
-                    .background(MaterialTheme.colorScheme.primary), horizontalAlignment = Alignment.CenterHorizontally
+                    .background(MaterialTheme.colorScheme.background), horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 SmallSpacer()
                 if (selectedFrame == "cover") {
@@ -144,7 +144,7 @@ fun DetailScreen(
                         modifier = Modifier
                             .padding(vertical = dimension.medium)
                             .clip(MaterialTheme.shapes.small)
-                            .background(MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f))
+                            .background(MaterialTheme.colorScheme.surface)
                             .padding(dimension.small)
                             .fillMaxWidth(0.9f)
                             .aspectRatio(1f),
@@ -240,7 +240,7 @@ fun BottomMediaBar(
     Column(
         Modifier
             .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.secondary)
+            .background(MaterialTheme.colorScheme.surface)
             .padding(dimension.medium),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -361,7 +361,7 @@ fun Header(
     Row(
         Modifier
             .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.primary)
+            .background(MaterialTheme.colorScheme.background)
             .padding(vertical = dimension.extraSmall),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
@@ -390,7 +390,7 @@ fun Header(
                 modifier = Modifier
                     .clip(CircleShape)
                     .background(
-                        if (selectedFrame == "cover") MaterialTheme.colorScheme.secondary.copy(alpha = 0.7f)
+                        if (selectedFrame == "cover") MaterialTheme.colorScheme.primary
                         else
                             Color.Unspecified
                     )
@@ -412,7 +412,7 @@ fun Header(
                 modifier = Modifier
                     .clip(CircleShape)
                     .background(
-                        if (selectedFrame == "lyrics") MaterialTheme.colorScheme.secondary.copy(alpha = 0.7f)
+                        if (selectedFrame == "lyrics") MaterialTheme.colorScheme.primary
                         else
                             Color.Unspecified
                     )

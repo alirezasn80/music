@@ -27,7 +27,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -37,14 +41,18 @@ import ir.flyap.music_a.ui.theme.MediumSpacer
 import ir.flyap.music_a.ui.theme.SmallSpacer
 import ir.flyap.music_a.ui.theme.dimension
 import ir.flyap.music_a.utill.CoilImage
+import ir.flyap.music_a.utill.openBrowser
 
 @OptIn(ExperimentalCoilApi::class)
 @Composable
 fun AboutFanScreen(upPress: () -> Unit, viewModel: AboutFanViewModel = hiltViewModel()) {
+    val context = LocalContext.current
     val state by viewModel.state.collectAsStateWithLifecycle()
     if (state.isLoading) {
         Box(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .background(MaterialTheme.colorScheme.background)
+                .fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
             CircularProgressIndicator()
@@ -53,6 +61,7 @@ fun AboutFanScreen(upPress: () -> Unit, viewModel: AboutFanViewModel = hiltViewM
         if (state.data == null) return
         Column(
             Modifier
+                .background(MaterialTheme.colorScheme.background)
                 .fillMaxSize(),
         ) {
             Row(
@@ -60,9 +69,17 @@ fun AboutFanScreen(upPress: () -> Unit, viewModel: AboutFanViewModel = hiltViewM
                     .fillMaxWidth()
                     .padding(dimension.medium), verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(imageVector = Icons.Rounded.ArrowForward, contentDescription = null, modifier = Modifier.clickable { upPress() })
+                Icon(
+                    imageVector = Icons.Rounded.ArrowForward,
+                    contentDescription = null,
+                    modifier = Modifier.clickable { upPress() },
+                    tint = MaterialTheme.colorScheme.onBackground
+                )
                 SmallSpacer()
-                Text(text = "درباره خواننده")
+                Text(
+                    text = "درباره خواننده",
+                    color = MaterialTheme.colorScheme.onBackground
+                )
             }
             Column(
                 Modifier
@@ -76,21 +93,32 @@ fun AboutFanScreen(upPress: () -> Unit, viewModel: AboutFanViewModel = hiltViewM
                 CoilImage(
                     modifier = Modifier
                         .clip(CircleShape)
-                        .size(100.dp), data = state.data!!.profile
+                        .size(150.dp), data = state.data!!.profile
                 )
                 SmallSpacer()
-                Text(text = state.data!!.name, style = MaterialTheme.typography.titleSmall)
+                Text(
+                    text = state.data!!.name,
+                    style = MaterialTheme.typography.titleSmall,
+                    color = MaterialTheme.colorScheme.onBackground
+                )
                 MediumSpacer()
                 Column(
                     Modifier
                         .fillMaxWidth()
                         .padding(dimension.medium)
-                        .background(MaterialTheme.colorScheme.secondary.copy(alpha = 0.8f), MaterialTheme.shapes.small)
+                        .background(MaterialTheme.colorScheme.surface, MaterialTheme.shapes.small)
                         .padding(dimension.medium)
                 ) {
-                    Text(text = "توضیحات", style = MaterialTheme.typography.titleSmall)
+                    Text(
+                        text = "توضیحات",
+                        style = MaterialTheme.typography.titleSmall,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
                     SmallSpacer()
-                    Text(text = state.data!!.description)
+                    Text(
+                        text = state.data!!.description,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
                 }
                 MediumSpacer()
                 Row(
@@ -101,27 +129,43 @@ fun AboutFanScreen(upPress: () -> Unit, viewModel: AboutFanViewModel = hiltViewM
                     if (state.data!!.telegram != null)
                         Row(
                             Modifier
-                                .background(MaterialTheme.colorScheme.secondary, MaterialTheme.shapes.medium)
+                                .clickable { context.openBrowser("https://t.me/${state.data!!.telegram!!}") }
+                                .background(MaterialTheme.colorScheme.surface, MaterialTheme.shapes.medium)
                                 .padding(dimension.medium),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text(text = state.data!!.telegram!!)
+                            Text(
+                                text = state.data!!.telegram!!,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
                             SmallSpacer()
-                            Icon(imageVector = Icons.Rounded.Home, contentDescription = null)
+                            Icon(
+                                imageVector = ImageVector.vectorResource(id = R.drawable.ic_telegram),
+                                contentDescription = null,
+                                tint = Color.Unspecified,
+                                modifier = Modifier.size(24.dp)
+                            )
                         } else
                         SmallSpacer()
 
-                    Row(
-                        Modifier
-                            .background(MaterialTheme.colorScheme.secondary, MaterialTheme.shapes.medium)
+                    if (state.data!!.instagram != null)
+                        Row(
+                            Modifier
+                                .clickable { context.openBrowser("https://www.instagram.com/${state.data!!.instagram!!}") }
+                                .background(MaterialTheme.colorScheme.surface, MaterialTheme.shapes.medium)
+                                .padding(dimension.medium),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(text = state.data!!.instagram!!, color = MaterialTheme.colorScheme.onSurface)
+                            SmallSpacer()
+                            Icon(
+                                imageVector = ImageVector.vectorResource(id = R.drawable.ic_instagram),
+                                contentDescription = null,
+                                tint = Color.Unspecified,
+                                modifier = Modifier.size(30.dp)
 
-                            .padding(dimension.medium),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(text = "instagram")
-                        SmallSpacer()
-                        Icon(imageVector = Icons.Rounded.Face, contentDescription = null)
-                    }
+                            )
+                        }
                 }
 
             }
