@@ -264,7 +264,7 @@ fun HomeScreen(
                     .fillMaxSize()
                     .padding(paddingValues)
             ) {
-                if (homeState.fans != null)
+                if (homeState.fans != null && homeState.fans?.data?.isNotEmpty() == true)
                     FansList(
                         fans = homeState.fans!!,
                         onClick = {
@@ -655,7 +655,8 @@ private fun BottomBarPlayer(
             .fillMaxWidth()
             .background(
                 MaterialTheme.colorScheme.surface,
-                RoundedCornerShape(topEnd = 5.dp, topStart = 5.dp))
+                RoundedCornerShape(topEnd = 5.dp, topStart = 5.dp)
+            )
             .clickable { onclick() }
             .padding(horizontal = dimension.medium, vertical = dimension.medium),
         verticalAlignment = Alignment.CenterVertically
