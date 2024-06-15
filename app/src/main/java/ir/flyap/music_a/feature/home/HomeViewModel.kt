@@ -22,6 +22,7 @@ import ir.tapsell.plus.model.TapsellPlusErrorModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import org.jsoup.Jsoup
 import javax.inject.Inject
 
 @HiltViewModel
@@ -42,7 +43,7 @@ class HomeViewModel @Inject constructor(
         getCommentStatus()
         if (isOnline(context))
             getFans()
-        else{
+        else {
             debug("not online")
         }
     }
@@ -110,6 +111,155 @@ class HomeViewModel @Inject constructor(
     fun setDialogKey(key: HomeDialogKey) {
         state.update { it.copy(dialogKey = key) }
     }
+
+    fun crawlTemp() {
+        debug("start crawl")
+        viewModelScope.launch(Dispatchers.IO) {
+            val url = "https://images.search.yahoo.com/search/images?p=flower"
+            val document = Jsoup.connect(url).get()
+            val images = document
+                // "tag#id"
+                .select("section#maindoc")
+                .select("section#mdoc")
+                .select("section#main")
+                .select("div#main-algo")
+                .select("div#res-cont")
+                .select("section#results")
+                // "tag.class"
+                .select("div.sres-cntr")
+                .select("ul#sres")
+                .tagName("li")
+                .select("a.redesign-img.round-img")
+                .select("img")
+                .map {
+                    it.absUrl("src")
+                }
+                .filter { it != null && it.isNotBlank() && it.startsWith("http") }
+                .take(20)
+
+            debug("images : ${images}")
+
+        }
+    }
+
+
+    /*.select("section#maindoc")//"tag#id"
+             .select("section#mdoc")
+             .select("section#main")
+             .select("div#main-algo")
+             .select("div#res-cont")
+             .select("section#results")
+             .select("div.sres-cntr")//"tag.class"
+             .select("ul#sres")
+             .tagName("li")
+             .select("a.redesign-img.round-img")
+             .select("img")
+             .map {
+                 it.absUrl("src")
+             }
+             .filter { it != null && it.isNotBlank() && it.startsWith("http") }
+             .take(20)*/
+
+    fun crawl() {
+        val url = "https://music-fa.com/artists/حامیم/"
+        debug("start crawl")
+
+
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+
+
+                val document = Jsoup.connect(url).get()
+
+                // Section1----------------------------------------------- url detail page
+
+                val result = document
+                    .select("div.mf_rw")
+                    .select("main.mf_home.mf_fx")
+                    .select("div.mf_cntrf")
+                    .select("article")
+                    .select("header")
+                    .select("h2")
+                    .select("a")
+                    .map { it.absUrl("href") }
+                    .get(2)
+                debug("result1 : ${result}")
+
+                // Section2----------------------------------------------------- cover, title,music,lyrics
+
+                val document2 = Jsoup.connect(result).get()
+
+                var result2 = document2
+                    .select("div.mf_rw")//tag.class
+                    .select("main.mf_home.mf_fx")
+                    .select("div.mf_cntrf")
+                    .select("article.mf_pst")
+
+
+                var title: String? = null
+                if (result2?.hasAttr("data-song") == true)
+                    title = result2.attr("data-song")
+
+                if (title.isNullOrEmpty()){
+                  title=  result2.select("header").select("h1")
+                        .select("a").attr("title")
+                }
+
+                debug("title : $title")
+
+
+
+
+                result2 = result2.select("div.ma_sngs")
+
+
+                // Img
+                val imgCover = result2
+                    .select("p.mf_ax")
+                    .select("img")
+                    .map { it.absUrl("data-src") }
+                    .first()
+
+                // Music
+                val music = result2
+                    .select("p.mf_dpbx")
+                    .select("span")
+                    .select("a.mf_mp3")
+                    .map { it.absUrl("href") }
+                    .last() // quality 128k ( .first() for quality 320K )
+
+
+                // Lyrics
+                val lyrics = result2
+                    .select("p:contains(───┤ ♩♬♫♪♭ ├───)")
+
+                val textContent = StringBuilder()
+
+                if (lyrics.size > 1) {
+                    var currentElement = lyrics[0].nextElementSibling()
+                    while (currentElement != null && currentElement != lyrics[1]) {
+                        textContent.append(currentElement.text()).append("\n")
+                        currentElement = currentElement.nextElementSibling()
+                    }
+                }
+
+
+                // Title
+
+                debug("img cover :$imgCover")
+
+                debug("music : $music")
+
+                debug("lyrics : $textContent")
+
+
+            } catch (e: Exception) {
+                debug("error:${e.message}")
+            }
+        }
+
+    }
+
 
     fun resetOpenAppCounter() {
         viewModelScope.launch {

@@ -27,6 +27,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.material.icons.rounded.Share
+import androidx.compose.material3.Button
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -239,21 +240,27 @@ fun HomeScreen(
                 }
             },
             topBar = {
-                Box(
-                    Modifier.fillMaxWidth(),
-                ) {
+                Column {
+                    Button(onClick = { homeViewModel.crawl() }) {
+                        Text(text = "Crawl")
+                    }
+                    Box(
+                        Modifier.fillMaxWidth(),
+                    ) {
 
-                    IconButton(onClick = { scope.launch { drawerState.open() } }) {
-                        Icon(imageVector = ImageVector.vectorResource(R.drawable.ic_menu), contentDescription = null)
+                        IconButton(onClick = { scope.launch { drawerState.open() } }) {
+                            Icon(imageVector = ImageVector.vectorResource(R.drawable.ic_menu), contentDescription = null)
+                        }
+
+                        Text(
+                            text = "آهنگ های محمدرضا گلزار",
+                            style = MaterialTheme.typography.titleSmall,
+                            modifier = Modifier
+                                .align(Alignment.Center)
+                                .clickable { navigationState.navToAboutSinger() }
+                        )
                     }
 
-                    Text(
-                        text = "آهنگ های محمدرضا گلزار",
-                        style = MaterialTheme.typography.titleSmall,
-                        modifier = Modifier
-                            .align(Alignment.Center)
-                            .clickable { navigationState.navToAboutSinger() }
-                    )
                 }
 
             }
