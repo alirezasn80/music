@@ -25,8 +25,8 @@ android {
         applicationId = "ir.flyap.music_a"
         minSdk = 21
         targetSdk = 34
-        versionCode = 1
-        versionName = "1.0.0"
+        versionCode = 101
+        versionName = "1.0.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -112,7 +112,7 @@ dependencies {
     implementation("ir.tapsell.plus:tapsell-plus-sdk-android:2.2.4")
 
     // Poolakey
-    implementation("com.github.cafebazaar.Poolakey:poolakey:2.2.0")
+    //implementation("com.github.cafebazaar.Poolakey:poolakey:2.2.0")
 
     // AppMetrica SDK.
     implementation("io.appmetrica.analytics:analytics:6.1.0")

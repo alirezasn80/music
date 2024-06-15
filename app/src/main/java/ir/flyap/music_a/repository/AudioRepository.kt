@@ -33,6 +33,7 @@ constructor(
             musics.forEach { item ->
 
                 val assetFileDescriptor = assetManager.openFd(item.musicPath)
+
                 mmr.setDataSource(assetFileDescriptor.fileDescriptor, assetFileDescriptor.startOffset, assetFileDescriptor.length)
 
                 val uri = Uri.parse("file:///android_asset/${item.musicPath}")
