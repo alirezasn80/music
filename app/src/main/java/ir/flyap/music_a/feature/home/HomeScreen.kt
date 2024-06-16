@@ -27,6 +27,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.material.icons.rounded.Share
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -281,20 +282,29 @@ fun HomeScreen(
                     onUpdate = homeViewModel::updateStandardBannerContainer
                 )
                 SmallSpacer()
-                LazyColumn {
-                    items(mediaState.musics) { audio ->
-                        AudioItem(
-                            music = audio,
-                            onItemClick = {
-                                if (audio.id != mediaState.currentMusic?.id) mediaViewModel.playAudio(audio)
-                                homeViewModel.showInterstitialAd(activity, navigationState::navToDetail)
-                            },
-                            onSaveFileClick = {}
-                        )
 
-
+                if (mediaState.isLoading) {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
                     }
-                }
+                } else
+                    LazyColumn {
+                        items(mediaState.musics) { audio ->
+                            AudioItem(
+                                music = audio,
+                                onItemClick = {
+                                    if (audio.id != mediaState.currentMusic?.id) mediaViewModel.playAudio(audio)
+                                    homeViewModel.showInterstitialAd(activity, navigationState::navToDetail)
+                                },
+                                onSaveFileClick = {}
+                            )
+
+
+                        }
+                    }
             }
 
         }

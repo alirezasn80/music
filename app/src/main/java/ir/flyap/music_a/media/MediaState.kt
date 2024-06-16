@@ -9,4 +9,5 @@ data class MediaState(
     val currentProgress: Float = 0f,
     val currentDuration: Long = 0L,
     val isPlaying:Boolean =false,
+    val isLoading:Boolean =false,
 )

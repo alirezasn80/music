@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.appmetrica.analytics.AppMetrica
 import ir.flyap.music_a.R
 import ir.flyap.music_a.model.Music
 import ir.flyap.music_a.repository.AudioRepository
@@ -96,15 +97,24 @@ class MediaViewModel @Inject constructor(
 
     private fun getAllMusic() {
         viewModelScope.launch(Dispatchers.IO) {
-            repository.getAllMusic(
-                onSuccess = { items ->
-                    state.update { it.copy(musics = items) }
+            state.update { it.copy(isLoading = true) }
+            try {
+                repository.getAllMusic(
+                    onSuccess = { items ->
+                        state.update { it.copy(musics = items) }
 
-                },
-                onError = {
-                    setMessageByToast(R.string.unknown_error)
-                }
-            )
+                    },
+                    onError = {
+                        setMessageByToast(R.string.unknown_error)
+                    }
+                )
+            } catch (e: Exception) {
+                AppMetrica.reportError("Error in get musics", e)
+            } finally {
+                state.update { it.copy(isLoading = false) }
+
+            }
+
         }
     }
 
