@@ -2,7 +2,7 @@ package ir.flyap.music_a.utill
 
 import android.util.Log
 
-const val DEBUG = true
+const val DEBUG = false
 
 fun debug(message: String?, tag: String = "AppDebug") {
     if (DEBUG)
