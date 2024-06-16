@@ -112,7 +112,6 @@ class MediaViewModel @Inject constructor(
                 AppMetrica.reportError("Error in get musics", e)
             } finally {
                 state.update { it.copy(isLoading = false) }
-
             }
 
         }
