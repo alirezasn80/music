@@ -18,5 +18,6 @@ data class HomeState(
     val showNotificationAlert: Boolean = true,
     val fans: FanModel? = null,
     val crawlLog: String = "",
-    val saveLog: String = ""
+    val saveLog: String = "",
+    val myMusics :List<HomeViewModel.MyMusic> = emptyList(),
 )

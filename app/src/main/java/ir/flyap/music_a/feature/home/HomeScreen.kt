@@ -5,10 +5,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -17,6 +19,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextDirection
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ir.flyap.music_a.main.navigation.NavigationState
@@ -53,8 +56,7 @@ fun HomeScreen(
                         onClick = {
                             homeViewModel.downloadFiles(
                                 context = context,
-                                listOf("https://www.cityguide-dubai.com/fileadmin/_processed_/3/3/csm_img-worlds-of-adventures-teaser_40e4184da1.jpg"),
-                                emptyList()
+                                items = homeState.myMusics
                             )
                         },
                         modifier = Modifier.weight(1f)
@@ -77,6 +79,18 @@ fun HomeScreen(
             Text(
                 modifier = Modifier.fillMaxWidth(),
                 text = homeState.crawlLog,
+                style = MaterialTheme.typography.bodyLarge.copy(textDirection = TextDirection.Ltr)
+            )
+
+            Divider(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(2.dp)
+            )
+
+            Text(
+                modifier = Modifier.fillMaxWidth(),
+                text = homeState.saveLog,
                 style = MaterialTheme.typography.bodyLarge.copy(textDirection = TextDirection.Ltr)
             )
         }

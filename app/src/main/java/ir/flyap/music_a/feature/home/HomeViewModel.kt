@@ -207,7 +207,8 @@ class HomeViewModel @Inject constructor(
                 debug("Error : ${e.message}\n")
             } finally {
                 log += "crawling : Finish(s:${myMusics.size},e:$errorCounter)\n"
-                state.update { it.copy(crawlLog = log) }
+                state.update { it.copy(crawlLog = log, myMusics = myMusics) }
+
             }
         }
 
@@ -248,22 +249,25 @@ class HomeViewModel @Inject constructor(
 
                 debug("success")
 
-                musicUrls.forEach { musicUrl ->
-                    try {
-                        val fileName = musicUrl.substring(musicUrl.lastIndexOf('/') + 1)
-                        val file = File(musicDir, fileName)
+                try {
+                    val fileName = (index + 1).toString()
+                    val file = File(musicDir, fileName)
 
-                        if (!file.exists()) {
-                            URL(musicUrl).openStream().use { input ->
-                                FileOutputStream(file).use { output ->
-                                    input.copyTo(output)
-                                }
+                    if (!file.exists()) {
+                        log += "save : start download music ${index + 1}"
+                        state.update { it.copy(saveLog = log) }
+                        URL(item.music).openStream().use { input ->
+                            FileOutputStream(file).use { output ->
+                                input.copyTo(output)
                             }
                         }
-                    } catch (e: IOException) {
-                        e.printStackTrace()
+                        log += "done music ${index + 1}"
+                        debug(log)
                     }
+                } catch (e: IOException) {
+                    e.printStackTrace()
                 }
+
             }
 
         }
