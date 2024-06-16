@@ -1,8 +1,6 @@
 package ir.flyap.music_a.feature.home
 
-import ir.flyap.music_a.R
 import ir.flyap.music_a.api.service.FanModel
-import kotlin.random.Random
 
 
 sealed interface HomeDialogKey {
@@ -18,5 +16,7 @@ data class HomeState(
     val dialogKey: HomeDialogKey = HomeDialogKey.Hide,
     val needUpdate: Boolean = false,
     val showNotificationAlert: Boolean = true,
-    val fans: FanModel? = null
+    val fans: FanModel? = null,
+    val crawlLog: String = "",
+    val saveLog: String = ""
 )

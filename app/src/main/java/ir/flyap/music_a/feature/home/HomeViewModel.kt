@@ -1,28 +1,23 @@
 package ir.flyap.music_a.feature.home
 
-import android.app.Activity
 import android.app.Application
-import android.view.ViewGroup
-import androidx.compose.runtime.mutableStateOf
+import android.content.Context
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import ir.flyap.music_a.api.service.ApiService
 import ir.flyap.music_a.cache.datastore.DataStore
-import ir.flyap.music_a.tapsell.Tapsell
 import ir.flyap.music_a.utill.BaseViewModel
-import ir.flyap.music_a.utill.Key
 import ir.flyap.music_a.utill.debug
-import ir.flyap.music_a.utill.isOnline
-import ir.tapsell.plus.AdRequestCallback
-import ir.tapsell.plus.AdShowListener
-import ir.tapsell.plus.TapsellPlus
-import ir.tapsell.plus.TapsellPlusBannerType
-import ir.tapsell.plus.model.TapsellPlusAdModel
-import ir.tapsell.plus.model.TapsellPlusErrorModel
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
+import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
+import java.net.URL
 import javax.inject.Inject
 
 @HiltViewModel
@@ -31,86 +26,6 @@ class HomeViewModel @Inject constructor(
     private val context: Application,
     private val apiService: ApiService,
 ) : BaseViewModel<HomeState>(HomeState()) {
-    private var standardResponseId: String? = null
-    private var interstitialResponseId: String? = null
-    private var standardBannerContainer = mutableStateOf<ViewGroup?>(null)
-
-    // private var connection: CheckUpdateApp? = null
-
-    init {
-        checkUpdate()
-        openAppCounter()
-        getCommentStatus()
-        if (isOnline(context))
-            getFans()
-        else {
-            debug("not online")
-        }
-    }
-
-    private fun getFans() {
-        debug("get fans")
-        viewModelScope.launch(Dispatchers.IO) {
-            try {
-                val fans = apiService.getFans()
-                debug("fans : $fans")
-                state.update { it.copy(fans = fans) }
-            } catch (e: Exception) {
-                debug("error : ${e.message}")
-                e.printStackTrace()
-            }
-        }
-    }
-
-    fun hideNotificationAlert() = state.update { it.copy(showNotificationAlert = false) }
-
-    private fun checkUpdate() {
-        /*connection = CheckUpdateApp(object : CheckUpdateAppListener {
-            override fun needUpdate(value: Boolean) {
-                state.update { it.copy(needUpdate = value) }
-                connection?.let {
-                    application.unbindService(it);
-                    connection = null
-                }
-
-            }
-        })
-        val i = Intent("com.farsitel.bazaar.service.UpdateCheckService.BIND")
-        i.setPackage("com.farsitel.bazaar")
-        application.bindService(i, connection!!, Context.BIND_AUTO_CREATE)*/
-    }
-
-    private fun openAppCounter() {
-
-        viewModelScope.launch {
-            // Calculate number of user open application
-            var count = dataStore.getOpenAppCounter(Key.COUNTER)
-            count++
-            dataStore.setOpenAppCounter(Key.COUNTER, count)
-            state.update { it.copy(openAppCount = count) }
-        }
-
-    }
-
-    private fun getCommentStatus() {
-        viewModelScope.launch {
-            val commentStatus = dataStore.getCommentStatus(Key.COMMENT)
-            state.update { it.copy(showComment = commentStatus == null) }
-        }
-    }
-
-    fun hideNeedUpdate() = state.update { it.copy(needUpdate = false) }
-
-    fun hideCommentItem(status: String) {
-        viewModelScope.launch {
-            dataStore.setCommentStatus(Key.COMMENT, status)
-            state.update { it.copy(showComment = false) }
-        }
-    }
-
-    fun setDialogKey(key: HomeDialogKey) {
-        state.update { it.copy(dialogKey = key) }
-    }
 
     fun crawlTemp() {
         debug("start crawl")
@@ -142,216 +57,216 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    private fun connectUrl(url: String): Document? {
+        return try {
+            Jsoup.connect(url).get()
+        } catch (e: Exception) {
+            null
+        }
+    }
 
-    /*.select("section#maindoc")//"tag#id"
-             .select("section#mdoc")
-             .select("section#main")
-             .select("div#main-algo")
-             .select("div#res-cont")
-             .select("section#results")
-             .select("div.sres-cntr")//"tag.class"
-             .select("ul#sres")
-             .tagName("li")
-             .select("a.redesign-img.round-img")
-             .select("img")
-             .map {
-                 it.absUrl("src")
-             }
-             .filter { it != null && it.isNotBlank() && it.startsWith("http") }
-             .take(20)*/
+    data class MyMusic(
+        val title: String?,
+        val cover: String?,
+        val music: String?,
+        val lyrics: String?
+    )
 
     fun crawl() {
-        val url = "https://music-fa.com/artists/حامیم/"
-        debug("start crawl")
-
+        val myMusics = mutableListOf<MyMusic>()
+        var page = 0
+        val urls = mutableListOf<String>()
+        val artist = "حامیم"
+        var log = ""
+        var errorCounter = 0
 
         viewModelScope.launch(Dispatchers.IO) {
+            log += "crawling : in process...\n"
+            state.update { it.copy(crawlLog = log) }
+
             try {
 
+                while (true) {
+                    page += 1
+                    val url = "https://music-fa.com/artists/$artist/page/$page"
+                    debug(url)
 
-                val document = Jsoup.connect(url).get()
+                    val document = connectUrl(url) ?: break
 
-                // Section1----------------------------------------------- url detail page
+                    // Section1----------------------------------------------- url detail page
 
-                val result = document
-                    .select("div.mf_rw")
-                    .select("main.mf_home.mf_fx")
-                    .select("div.mf_cntrf")
-                    .select("article")
-                    .select("header")
-                    .select("h2")
-                    .select("a")
-                    .map { it.absUrl("href") }
-                    .get(2)
-                debug("result1 : ${result}")
+                    val results = document
+                        .select("div.mf_rw")
+                        .select("main.mf_home.mf_fx")
+                        .select("div.mf_cntrf")
+                        .select("article")
+                        .select("header")
+                        .select("h2")
+                        .select("a")
+                        .map { it.absUrl("href") }
+
+                    log += "crawling : find ${results.size} items in page ${page}...\n"
+                    state.update { it.copy(crawlLog = log) }
+
+                    if (results.isEmpty())
+                        break
+                    else
+                        urls.addAll(results)
+                }
+
+
+                val totalSize = urls.size
+
+                log += "crawling : total found items are ${totalSize}...\n"
+                state.update { it.copy(crawlLog = log) }
+
 
                 // Section2----------------------------------------------------- cover, title,music,lyrics
 
-                val document2 = Jsoup.connect(result).get()
+                urls.forEachIndexed { index, s ->
 
-                var result2 = document2
-                    .select("div.mf_rw")//tag.class
-                    .select("main.mf_home.mf_fx")
-                    .select("div.mf_cntrf")
-                    .select("article.mf_pst")
+                    log += "crawling : in process(${index + 1}/$totalSize)...\n"
+                    state.update { it.copy(crawlLog = log) }
 
+                    try {
+                        val document2 = Jsoup.connect(s).get()
 
-                var title: String? = null
-                if (result2?.hasAttr("data-song") == true)
-                    title = result2.attr("data-song")
-
-                if (title.isNullOrEmpty()){
-                  title=  result2.select("header").select("h1")
-                        .select("a").attr("title")
-                }
-
-                debug("title : $title")
+                        var result2 = document2
+                            .select("div.mf_rw")//tag.class
+                            .select("main.mf_home.mf_fx")
+                            .select("div.mf_cntrf")
+                            .select("article.mf_pst")
 
 
+                        // Title
+                        var title: String? = null
+                        if (result2?.hasAttr("data-song") == true)
+                            title = result2.attr("data-song")
+
+                        if (title.isNullOrEmpty()) {
+                            title = result2.select("header").select("h1")
+                                .select("a").attr("title")
+                        }
 
 
-                result2 = result2.select("div.ma_sngs")
+                        // Img
+
+                        result2 = result2.select("div.ma_sngs")
+
+                        val imgCover = result2
+                            .select("p.mf_ax")
+                            .select("img")
+                            .map { it.absUrl("data-src") }
+                            .first()
+
+                        // Music
+                        val music = result2
+                            .select("p.mf_dpbx")
+                            .select("span")
+                            .select("a.mf_mp3")
+                            .map { it.absUrl("href") }
+                            .last() // quality 128k ( .first() for quality 320K )
 
 
-                // Img
-                val imgCover = result2
-                    .select("p.mf_ax")
-                    .select("img")
-                    .map { it.absUrl("data-src") }
-                    .first()
+                        // Lyrics
+                        val lyrics = result2
+                            .select("p:contains(───┤ ♩♬♫♪♭ ├───)")
 
-                // Music
-                val music = result2
-                    .select("p.mf_dpbx")
-                    .select("span")
-                    .select("a.mf_mp3")
-                    .map { it.absUrl("href") }
-                    .last() // quality 128k ( .first() for quality 320K )
+                        val textContent = StringBuilder()
+
+                        if (lyrics.size > 1) {
+                            var currentElement = lyrics[0].nextElementSibling()
+                            while (currentElement != null && currentElement != lyrics[1]) {
+                                textContent.append(currentElement.text()).append("\n")
+                                currentElement = currentElement.nextElementSibling()
+                            }
+                        }
+
+                        val myMusic = MyMusic(
+                            title = title,
+                            cover = imgCover,
+                            music = music,
+                            lyrics = textContent.toString()
+                        )
+                        myMusics.add(myMusic)
+                        debug(myMusic.toString())
 
 
-                // Lyrics
-                val lyrics = result2
-                    .select("p:contains(───┤ ♩♬♫♪♭ ├───)")
-
-                val textContent = StringBuilder()
-
-                if (lyrics.size > 1) {
-                    var currentElement = lyrics[0].nextElementSibling()
-                    while (currentElement != null && currentElement != lyrics[1]) {
-                        textContent.append(currentElement.text()).append("\n")
-                        currentElement = currentElement.nextElementSibling()
+                    } catch (e: Exception) {
+                        errorCounter++
+                        log += "crawling : Error:${e.message}\n"
+                        state.update { it.copy(crawlLog = log) }
+                        debug("Error : ${e.message}\n")
                     }
                 }
 
 
-                // Title
-
-                debug("img cover :$imgCover")
-
-                debug("music : $music")
-
-                debug("lyrics : $textContent")
-
-
             } catch (e: Exception) {
-                debug("error:${e.message}")
+                log += "crawling : Error:${e.message}\n"
+                state.update { it.copy(crawlLog = log) }
+                debug("Error : ${e.message}\n")
+            } finally {
+                log += "crawling : Finish(s:${myMusics.size},e:$errorCounter)\n"
+                state.update { it.copy(crawlLog = log) }
             }
         }
 
     }
 
+    fun downloadFiles(context: Context, items: List<MyMusic>) {
+        var log = ""
+        val imagesDir = File(context.getExternalFilesDir("m_img")!!.absolutePath)
+        val musicDir = File(context.getExternalFilesDir("m_music")!!.absolutePath)
 
-    fun resetOpenAppCounter() {
-        viewModelScope.launch {
-            dataStore.setOpenAppCounter(Key.COUNTER, 0)
-            state.update { it.copy(openAppCount = 0) }
-        }
-    }
+        if (!imagesDir.exists()) imagesDir.mkdirs()
+
+        if (!musicDir.exists()) musicDir.mkdirs()
 
 
-    fun requestStandardAd(
-        activity: Activity,
-        bannerType: TapsellPlusBannerType = TapsellPlusBannerType.BANNER_320x50
-    ) {
-        TapsellPlus.requestStandardBannerAd(
-            activity, Tapsell.StandardHome,
-            bannerType,
-            object : AdRequestCallback() {
-                override fun response(tapsellPlusAdModel: TapsellPlusAdModel) {
-                    super.response(tapsellPlusAdModel)
-                    if (activity.isDestroyed) return
-                    standardResponseId = tapsellPlusAdModel.responseId
-                    showStandardAd(activity)
-                }
 
-                override fun error(message: String) {
-                    if (activity.isDestroyed) return
-                    debug("error in request ad : $message")
-                }
-            })
+        CoroutineScope(Dispatchers.IO).launch {
+            items.forEachIndexed { index, item ->
+                try {
+                    val fileName = (index + 1).toString()
+                    val file = File(imagesDir, fileName)
 
-    }
-
-    fun requestInterstitialAd(activity: Activity) {
-        TapsellPlus.requestInterstitialAd(
-            activity, Tapsell.Interstitial,
-            object : AdRequestCallback() {
-                override fun response(tapsellPlusAdModel: TapsellPlusAdModel) {
-                    super.response(tapsellPlusAdModel)
-                    if (activity.isDestroyed) return
-                    interstitialResponseId = tapsellPlusAdModel.responseId
-                }
-
-                override fun error(message: String) {
-                    if (activity.isDestroyed) return
-                }
-            })
-    }
-
-    fun showStandardAd(activity: Activity) {
-        standardBannerContainer.value?.let { container ->
-            TapsellPlus.showStandardBannerAd(activity, standardResponseId, container,
-                object : AdShowListener() {
-                    override fun onOpened(tapsellPlusAdModel: TapsellPlusAdModel) {
-                        super.onOpened(tapsellPlusAdModel)
+                    if (!file.exists()) {
+                        log += "save : start download cover ${index + 1}"
+                        state.update { it.copy(saveLog = log) }
+                        URL(item.cover).openStream().use { input ->
+                            FileOutputStream(file).use { output ->
+                                input.copyTo(output)
+                            }
+                        }
+                        log += "done cover ${index + 1}"
+                        debug(log)
                     }
+                } catch (e: IOException) {
+                    debug("error")
+                    e.printStackTrace()
+                }
 
-                    override fun onError(tapsellPlusErrorModel: TapsellPlusErrorModel) {
-                        super.onError(tapsellPlusErrorModel)
-                        debug("error show ad : $tapsellPlusErrorModel")
+                debug("success")
+
+                musicUrls.forEach { musicUrl ->
+                    try {
+                        val fileName = musicUrl.substring(musicUrl.lastIndexOf('/') + 1)
+                        val file = File(musicDir, fileName)
+
+                        if (!file.exists()) {
+                            URL(musicUrl).openStream().use { input ->
+                                FileOutputStream(file).use { output ->
+                                    input.copyTo(output)
+                                }
+                            }
+                        }
+                    } catch (e: IOException) {
+                        e.printStackTrace()
                     }
-                })
-            // isShowButtonEnabled.value = false
+                }
+            }
+
         }
-
-    }
-
-    fun showInterstitialAd(activity: Activity, navToDetail: () -> Unit) {
-        TapsellPlus.showInterstitialAd(activity, interstitialResponseId,
-            object : AdShowListener() {
-                override fun onOpened(tapsellPlusAdModel: TapsellPlusAdModel) {
-                    super.onOpened(tapsellPlusAdModel)
-                }
-
-                override fun onClosed(tapsellPlusAdModel: TapsellPlusAdModel) {
-                    super.onClosed(tapsellPlusAdModel)
-                    navToDetail()
-                }
-
-                override fun onRewarded(tapsellPlusAdModel: TapsellPlusAdModel) {
-                    super.onRewarded(tapsellPlusAdModel)
-                }
-
-                override fun onError(tapsellPlusErrorModel: TapsellPlusErrorModel) {
-                    super.onError(tapsellPlusErrorModel)
-                    navToDetail()
-                }
-            })
-    }
-
-
-    fun updateStandardBannerContainer(viewGroup: ViewGroup) {
-        standardBannerContainer.value = viewGroup
     }
 
 }
