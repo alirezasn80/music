@@ -214,10 +214,13 @@ class HomeViewModel @Inject constructor(
 
     }
 
+    //val path = Environment.getExternalStorageDirectory().path + "/seyed_crawl"
+    //val imagesDir = File("$path/cover")
+    //val musicDir = File("$path/music")
     fun downloadFiles(context: Context, items: List<MyMusic>) {
         var log = ""
-        val imagesDir = File(context.getExternalFilesDir("m_img")!!.absolutePath)
-        val musicDir = File(context.getExternalFilesDir("m_music")!!.absolutePath)
+        val imagesDir = File(context.getExternalFilesDir("cover")!!.absolutePath)
+        val musicDir = File(context.getExternalFilesDir("audio")!!.absolutePath)
 
         if (!imagesDir.exists()) imagesDir.mkdirs()
 
@@ -228,47 +231,56 @@ class HomeViewModel @Inject constructor(
         CoroutineScope(Dispatchers.IO).launch {
             items.forEachIndexed { index, item ->
                 try {
-                    val fileName = (index + 1).toString()
+                    val fileName = (index + 1).toString() + ".jpg"
                     val file = File(imagesDir, fileName)
 
                     if (!file.exists()) {
-                        log += "save : start download cover ${index + 1}"
+
+                        log += "save : start download cover ${index + 1} ...\n"
                         state.update { it.copy(saveLog = log) }
+
                         URL(item.cover).openStream().use { input ->
                             FileOutputStream(file).use { output ->
                                 input.copyTo(output)
                             }
                         }
-                        log += "done cover ${index + 1}"
-                        debug(log)
+
+                        log += "done cover ${index + 1}\n"
+                        state.update { it.copy(saveLog = log) }
                     }
                 } catch (e: IOException) {
-                    debug("error")
+                    log += "Error cover ${index + 1} (${e.message})\n"
+                    state.update { it.copy(saveLog = log) }
                     e.printStackTrace()
                 }
 
-                debug("success")
 
                 try {
-                    val fileName = (index + 1).toString()
+                    val fileName = (index + 1).toString() + ".mp3"
                     val file = File(musicDir, fileName)
 
                     if (!file.exists()) {
-                        log += "save : start download music ${index + 1}"
+                        log += "save : start download music ${index + 1} ...\n"
                         state.update { it.copy(saveLog = log) }
                         URL(item.music).openStream().use { input ->
                             FileOutputStream(file).use { output ->
                                 input.copyTo(output)
                             }
                         }
-                        log += "done music ${index + 1}"
-                        debug(log)
+                        log += "done music ${index + 1}\n"
+                        state.update { it.copy(saveLog = log) }
                     }
                 } catch (e: IOException) {
+                    log += "Error Music ${index + 1} (${e.message})\n"
+                    state.update { it.copy(saveLog = log) }
                     e.printStackTrace()
                 }
 
             }
+
+
+            log += "Finish Saving\n"
+            state.update { it.copy(saveLog = log) }
 
         }
     }

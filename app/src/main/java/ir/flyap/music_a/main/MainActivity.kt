@@ -47,8 +47,7 @@ class MainActivity : ComponentActivity() {
 
                     composable(Screen.Home.route) {
                         HomeScreen(
-                            navigationState = navigationState,
-                            mediaViewModel = mediaViewModel!!
+
                         )
                     }
 

@@ -1,5 +1,14 @@
 package ir.flyap.music_a.feature.home
 
+import android.app.Activity
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import android.os.Build
+import android.os.Environment
+import android.provider.DocumentsContract
+import android.provider.Settings
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -15,6 +24,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -29,8 +39,6 @@ import ir.flyap.music_a.utill.rememberPermissionState
 
 @Composable
 fun HomeScreen(
-    navigationState: NavigationState,
-    mediaViewModel: MediaViewModel,
     homeViewModel: HomeViewModel = hiltViewModel()
 ) {
     val homeState by homeViewModel.state.collectAsStateWithLifecycle()
@@ -40,6 +48,15 @@ fun HomeScreen(
         onGranted = {},
         onDenied = {}
     )
+
+    LaunchedEffect(key1 = Unit) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            if (!Environment.isExternalStorageManager()) {
+                val uri = Uri.parse("package:ir.flyap.music_a")
+                (context as Activity).startActivity(Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION, uri))
+            }
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -56,7 +73,7 @@ fun HomeScreen(
                         onClick = {
                             homeViewModel.downloadFiles(
                                 context = context,
-                                items = homeState.myMusics
+                                items = homeState.myMusics.take(2)
                             )
                         },
                         modifier = Modifier.weight(1f)
