@@ -20,4 +20,5 @@ data class HomeState(
     val crawlLog: String = "",
     val saveLog: String = "",
     val myMusics :List<HomeViewModel.MyMusic> = emptyList(),
+    val timeouts:List<String> = emptyList(),
 )

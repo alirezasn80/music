@@ -1,14 +1,11 @@
 package ir.flyap.music_a.feature.home
 
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
-import android.provider.DocumentsContract
 import android.provider.Settings
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -32,8 +29,8 @@ import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import ir.flyap.music_a.main.navigation.NavigationState
-import ir.flyap.music_a.media.MediaViewModel
+import ir.flyap.music_a.ui.theme.ExtraSmallSpacer
+import ir.flyap.music_a.ui.theme.SmallSpacer
 import ir.flyap.music_a.ui.theme.dimension
 import ir.flyap.music_a.utill.rememberPermissionState
 
@@ -61,19 +58,25 @@ fun HomeScreen(
     Scaffold(
         topBar = {
             Column {
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                Row(
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(dimension.small), horizontalArrangement = Arrangement.SpaceBetween
+                ) {
                     Button(
-                        onClick = { homeViewModel.crawl() },
+                        onClick = { homeViewModel.mainCrawl() },
                         modifier = Modifier.weight(1f)
                     ) {
                         Text(text = "Crawl")
                     }
 
+                    SmallSpacer()
+
                     Button(
                         onClick = {
                             homeViewModel.downloadFiles(
                                 context = context,
-                                items = homeState.myMusics.take(2)
+                                items = homeState.myMusics
                             )
                         },
                         modifier = Modifier.weight(1f)
@@ -81,6 +84,16 @@ fun HomeScreen(
                         Text(text = "Save")
                     }
                 }
+                ExtraSmallSpacer()
+                Button(
+                    onClick = {
+                        homeViewModel.itemCrawl(homeState.timeouts)
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(text = "Check Timeouts")
+                }
+
 
             }
 
