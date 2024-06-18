@@ -243,6 +243,7 @@ class HomeViewModel @Inject constructor(
                             FileOutputStream(file).use { output ->
                                 input.copyTo(output)
                             }
+
                         }
 
                         log += "done cover ${index + 1}\n"
