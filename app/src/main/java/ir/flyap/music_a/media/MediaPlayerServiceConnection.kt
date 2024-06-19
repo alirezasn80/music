@@ -63,7 +63,9 @@ class MediaPlayerServiceConnection @Inject constructor(
 
     fun playAudio(music: List<Music>) {
         musicList = music
-        mediaBrowser.sendCustomAction(MediaSetting.START_MEDIA_PLAY_ACTION, null, null)
+
+        if (mediaBrowser.isConnected)
+            mediaBrowser.sendCustomAction(MediaSetting.START_MEDIA_PLAY_ACTION, null, null)
     }
 
     fun fastForward(seconds: Int = 10) {

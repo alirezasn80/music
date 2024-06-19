@@ -277,7 +277,10 @@ fun HomeScreen(
                     onAlbumClick = mediaViewModel::onAlbumClick
                 )
                 SmallSpacer()
-                PlayAll(onClick = { mediaViewModel.playAudio(mediaState.musics[0]) })
+                PlayAll(onClick = {
+                    if (mediaState.musics.isNotEmpty())
+                        mediaViewModel.playAudio(mediaState.musics[0])
+                })
                 StandardAd(
                     onUpdate = homeViewModel::updateStandardBannerContainer
                 )
