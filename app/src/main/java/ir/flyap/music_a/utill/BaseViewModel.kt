@@ -3,7 +3,7 @@ package ir.flyap.music_a.utill
 import androidx.compose.runtime.*
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import ir.flyap.music_a.R
+import ir.flyap.music_hamim.R
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 

@@ -6,7 +6,7 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
-import ir.flyap.music_a.R
+import ir.flyap.music_hamim.R
 
 
 private val Vasir = FontFamily(Font(R.font.vazir))

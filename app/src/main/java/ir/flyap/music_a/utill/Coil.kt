@@ -21,7 +21,7 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.CachePolicy
 import coil.request.ImageRequest
 import coil.transition.CrossfadeTransition
-import ir.flyap.music_a.R
+import ir.flyap.music_hamim.R
 
 @ExperimentalCoilApi
 @Composable

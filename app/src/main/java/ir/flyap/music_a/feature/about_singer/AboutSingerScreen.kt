@@ -22,11 +22,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.sp
-import ir.flyap.music_a.R
+
 import ir.flyap.music_a.feature.detail.UpPress
 import ir.flyap.music_a.ui.theme.MediumSpacer
 import ir.flyap.music_a.ui.theme.SmallSpacer
 import ir.flyap.music_a.ui.theme.dimension
+import ir.flyap.music_hamim.R
 
 @Composable
 fun AboutSingerScreen(upPress: () -> Unit) {

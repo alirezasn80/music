@@ -8,10 +8,10 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="ir.flyap.music_a" />
-                  <option name="mobileSdkAppId" value="1:1005699663240:android:a304758321477fb024a63d" />
-                  <option name="projectId" value="music-golzar" />
-                  <option name="projectNumber" value="1005699663240" />
+                  <option name="appId" value="PLACEHOLDER" />
+                  <option name="mobileSdkAppId" value="" />
+                  <option name="projectId" value="" />
+                  <option name="projectNumber" value="" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />

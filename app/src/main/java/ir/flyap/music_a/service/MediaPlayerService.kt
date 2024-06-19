@@ -22,7 +22,7 @@ import com.google.android.exoplayer2.ext.mediasession.TimelineQueueNavigator
 import com.google.android.exoplayer2.ui.PlayerNotificationManager
 import com.google.android.exoplayer2.upstream.cache.CacheDataSource
 import dagger.hilt.android.AndroidEntryPoint
-import ir.flyap.music_a.R
+import ir.flyap.music_hamim.R
 import ir.flyap.music_a.media.MediaSetting
 import ir.flyap.music_a.media.MediaPlayerNotificationManager
 import ir.flyap.music_a.media.MediaSource

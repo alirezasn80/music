@@ -7,7 +7,7 @@ import android.support.v4.media.session.MediaControllerCompat
 import android.support.v4.media.session.MediaSessionCompat
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.ui.PlayerNotificationManager
-import ir.flyap.music_a.R
+import ir.flyap.music_hamim.R
 
 internal class MediaPlayerNotificationManager(
     context: Context,

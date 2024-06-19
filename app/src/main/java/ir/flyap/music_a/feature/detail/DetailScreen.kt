@@ -57,7 +57,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import ir.flyap.music_a.R
+import ir.flyap.music_hamim.R
 import ir.flyap.music_a.media.MediaViewModel
 import ir.flyap.music_a.main.navigation.NavigationState
 import ir.flyap.music_a.ui.theme.ExtraSmallSpacer

@@ -68,7 +68,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.annotation.ExperimentalCoilApi
 import io.appmetrica.analytics.AppMetrica
-import ir.flyap.music_a.R
+import ir.flyap.music_hamim.R
 import ir.flyap.music_a.api.service.FanModel
 import ir.flyap.music_a.main.navigation.NavigationState
 import ir.flyap.music_a.media.MediaViewModel

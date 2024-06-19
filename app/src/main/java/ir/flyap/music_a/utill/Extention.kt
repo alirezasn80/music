@@ -11,7 +11,7 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import io.appmetrica.analytics.AppMetrica
-import ir.flyap.music_a.R
+import ir.flyap.music_hamim.R
 import ir.flyap.music_a.model.Music
 import okhttp3.Interceptor
 import okio.Buffer

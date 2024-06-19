@@ -14,7 +14,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
-import ir.flyap.music_a.R
+import ir.flyap.music_hamim.R
 import ir.flyap.music_a.ui.theme.LargeSpacer
 import ir.flyap.music_a.ui.theme.MediumSpacer
 import ir.flyap.music_a.ui.theme.dimension

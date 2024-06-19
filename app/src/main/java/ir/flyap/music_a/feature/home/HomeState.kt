@@ -1,6 +1,6 @@
 package ir.flyap.music_a.feature.home
 
-import ir.flyap.music_a.R
+import ir.flyap.music_hamim.R
 import ir.flyap.music_a.api.service.FanModel
 import kotlin.random.Random
 
