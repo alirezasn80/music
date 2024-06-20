@@ -159,7 +159,7 @@ fun Context.shareText(textId: Int) {
 fun Context.openBazaarComment() {
     try {
         val intent = Intent(Intent.ACTION_EDIT)
-        intent.setData(Uri.parse("bazaar://details?id=ir.flyap.music_a"))
+        intent.setData(Uri.parse("bazaar://details?id=ir.flyap.music_hamim"))
         intent.setPackage("com.farsitel.bazaar")
         startActivity(intent)
     } catch (e: Exception) {
@@ -169,7 +169,7 @@ fun Context.openBazaarComment() {
 }
 
 
-fun Context.openBrowser(url:String) {
+fun Context.openBrowser(url: String) {
     try {
         val webpage: Uri = Uri.parse(url)
         val intent = Intent(Intent.ACTION_VIEW, webpage)

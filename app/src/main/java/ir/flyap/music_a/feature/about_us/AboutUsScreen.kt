@@ -47,7 +47,7 @@ fun AboutUsScreen(upPress: () -> Unit) {
                 tint = MaterialTheme.colorScheme.onBackground
             )
             SmallSpacer()
-            Text(text = "درباره خواننده", color = MaterialTheme.colorScheme.onBackground)
+            Text(text = "درباره ما", color = MaterialTheme.colorScheme.onBackground)
 
         }
         SmallSpacer()

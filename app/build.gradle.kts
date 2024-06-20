@@ -25,8 +25,8 @@ android {
         applicationId = "ir.flyap.music_hamim"
         minSdk = 21
         targetSdk = 34
-        versionCode = 102
-        versionName = "1.0.2"
+        versionCode = 100
+        versionName = "1.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
