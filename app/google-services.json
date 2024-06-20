@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "1005699663240",
-    "project_id": "music-golzar",
-    "storage_bucket": "music-golzar.appspot.com"
+    "project_number": "395119408018",
+    "project_id": "music-hamim",
+    "storage_bucket": "music-hamim.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:1005699663240:android:a304758321477fb024a63d",
+        "mobilesdk_app_id": "1:395119408018:android:348e72364893398673874b",
         "android_client_info": {
           "package_name": "ir.flyap.music_hamim"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyBWfD_9zAzjArcU7w4PuarLBHxnezPLhGg"
+          "current_key": "AIzaSyDYFeB0KNrNE_tKZ1OWbZj3MbKXp6qcpQE"
         }
       ],
       "services": {
