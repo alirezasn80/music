@@ -4,15 +4,15 @@
     "type": "APK",
     "kind": "Directory"
   },
-  "applicationId": "ir.flyap.music_a",
+  "applicationId": "ir.flyap.music_hamim",
   "variantName": "release",
   "elements": [
     {
       "type": "SINGLE",
       "filters": [],
       "attributes": [],
-      "versionCode": 102,
-      "versionName": "1.0.2",
+      "versionCode": 100,
+      "versionName": "1.0.0",
       "outputFile": "app-release.apk"
     }
   ],
