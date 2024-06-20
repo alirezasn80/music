@@ -66,6 +66,6 @@ fun AboutUsScreen(upPress: () -> Unit) {
         MediumSpacer()
         Text(text = "منبع موزیک ها", color = MaterialTheme.colorScheme.onBackground)
         ExtraSmallSpacer()
-        Text(text = "نیک موزیک", color = MaterialTheme.colorScheme.onBackground, style = MaterialTheme.typography.labelSmall)
+        Text(text = "موزیک فا", color = MaterialTheme.colorScheme.onBackground, style = MaterialTheme.typography.labelSmall)
     }
 }

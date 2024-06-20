@@ -91,7 +91,7 @@ fun DetailScreen(
         Scaffold(
             topBar = {
                 Header(
-                    title = mediaState.currentMusic!!.displayName,
+                    title = mediaState.currentMusic!!.displayName+"(${mediaState.currentMusic!!.id})",
                     upPress = navigationState::upPress,
                     selectedFrame = selectedFrame,
                     onItemClick = { selectedFrame = it }

@@ -249,7 +249,7 @@ fun HomeScreen(
                     }
 
                     Text(
-                        text = "آهنگ های محمدرضا گلزار",
+                        text = stringResource(id = R.string.app_name),
                         style = MaterialTheme.typography.titleSmall,
                         modifier = Modifier
                             .align(Alignment.Center)
