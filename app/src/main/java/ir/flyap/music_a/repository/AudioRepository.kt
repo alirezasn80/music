@@ -29,6 +29,7 @@ constructor(
 
         try {
             val musics = db.musicDao.getAllMusic()
+            debug("db  :${musics.toString()}")
 
             musics.forEach { item ->
 
@@ -42,6 +43,7 @@ constructor(
                 val duration = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION) ?: ""
                 val title = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE) ?: "نامشخص"
                 val id = item.id.toString()
+                debug("title : $title, duration  :$duration")
 
                 music.add(
                     Music(
