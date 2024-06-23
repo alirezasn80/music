@@ -23,6 +23,8 @@ import java.io.IOException
 import java.net.URL
 import javax.inject.Inject
 
+private val removeWords = listOf("دانلود", "اهنگ", "آهنگ", "مداحی", "نوحه", "روضه")
+
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val dataStore: DataStore,
@@ -49,11 +51,11 @@ class HomeViewModel @Inject constructor(
         val lyrics: String?
     )
 
-    fun mainCrawl() {
+    fun mainCrawl(artist: String) {
         myMusics = mutableListOf<MyMusic>()
         var page = 0
         val urls = mutableListOf<String>()
-        val artist = "حامیم"
+
         var log = ""
 
 
@@ -109,7 +111,7 @@ class HomeViewModel @Inject constructor(
 
                 // cover, title,music,lyrics
 
-                itemCrawl(urls)
+                itemCrawl(urls,artist)
 
 
             } catch (e: Exception) {
@@ -121,7 +123,16 @@ class HomeViewModel @Inject constructor(
 
     }
 
-     fun itemCrawl(items: List<String>) {
+
+    fun removeWords(input: String, words: List<String>): String {
+        var result = input
+        for (word in words) {
+            result = result.replace(word, "")
+        }
+        return result.trim()
+    }
+
+    fun itemCrawl(items: List<String>, artist: String) {
         val urlTimeouts = mutableListOf<String>()
         errorCounter = 0
         val totalSize = items.size
@@ -160,6 +171,8 @@ class HomeViewModel @Inject constructor(
                     if (title.isNullOrEmpty()) {
                         title = result2.select("header").select("h1")
                             .select("a").attr("title")
+
+                        title = removeWords(title, removeWords + artist)
                     }
 
 

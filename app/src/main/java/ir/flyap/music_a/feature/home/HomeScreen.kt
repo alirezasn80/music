@@ -20,9 +20,13 @@ import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextDirection
@@ -57,14 +61,21 @@ fun HomeScreen(
 
     Scaffold(
         topBar = {
-            Column {
+            var artist by remember { mutableStateOf("") }
+            Column (modifier = Modifier.padding(dimension.medium)){
+                TextField(
+                    value = artist,
+                    onValueChange = { artist = it },
+                    modifier = Modifier.fillMaxWidth()
+                )
                 Row(
                     Modifier
                         .fillMaxWidth()
                         .padding(dimension.small), horizontalArrangement = Arrangement.SpaceBetween
                 ) {
+                    SmallSpacer()
                     Button(
-                        onClick = { homeViewModel.mainCrawl() },
+                        onClick = { homeViewModel.mainCrawl(artist) },
                         modifier = Modifier.weight(1f)
                     ) {
                         Text(text = "Crawl")
@@ -87,7 +98,7 @@ fun HomeScreen(
                 ExtraSmallSpacer()
                 Button(
                     onClick = {
-                        homeViewModel.itemCrawl(homeState.timeouts)
+                        homeViewModel.itemCrawl(homeState.timeouts, artist)
                     },
                     modifier = Modifier.fillMaxWidth()
                 ) {
