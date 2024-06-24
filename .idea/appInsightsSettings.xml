@@ -8,10 +8,10 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="ir.flyap.music_hamim" />
-                  <option name="mobileSdkAppId" value="1:1005699663240:android:a304758321477fb024a63d" />
-                  <option name="projectId" value="music-golzar" />
-                  <option name="projectNumber" value="1005699663240" />
+                  <option name="appId" value="ir.flyap.madahi_rasooli" />
+                  <option name="mobileSdkAppId" value="1:395119408018:android:348e72364893398673874b" />
+                  <option name="projectId" value="music-hamim" />
+                  <option name="projectNumber" value="395119408018" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />

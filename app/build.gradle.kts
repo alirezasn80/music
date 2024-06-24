@@ -18,11 +18,11 @@ appmetrica {
 }
 
 android {
-    namespace = "ir.flyap.music_hamim"
+    namespace = "ir.flyap.madahi_rasooli"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "ir.flyap.music_hamim"
+        applicationId = "ir.flyap.madahi_rasooli"
         minSdk = 21
         targetSdk = 34
         versionCode = 100
