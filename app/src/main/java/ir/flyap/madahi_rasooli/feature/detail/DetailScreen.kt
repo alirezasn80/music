@@ -89,7 +89,7 @@ fun DetailScreen(
         Scaffold(
             topBar = {
                 Header(
-                    title = mediaState.currentMusic!!.displayName+"(${mediaState.currentMusic!!.id})",
+                    title = mediaState.currentMusic!!.displayName/*+"(${mediaState.currentMusic!!.id})"*/,
                     upPress = navigationState::upPress,
                     selectedFrame = selectedFrame,
                     onItemClick = { selectedFrame = it }
@@ -255,8 +255,8 @@ fun BottomMediaBar(
                 interactionSource = interactionSource
             )
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                Text(text = timeStampToDuration(duration))
                 Text(text = timeStampToDuration(currentDuration))
+                Text(text = timeStampToDuration(duration))
             }
         }
 

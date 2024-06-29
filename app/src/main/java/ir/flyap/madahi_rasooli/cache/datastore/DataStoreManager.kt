@@ -56,11 +56,11 @@ class DataStoreManager(
 
 
     // Getter and setter comment
-    override suspend fun setCommentStatus(key: String, value: String) {
-        setStringValue(key, value)
+    override suspend fun setHideAskComment(key: String, value: Boolean) {
+        setBooleanValue(key, value)
     }
 
-    override suspend fun getCommentStatus(key: String): String? = getStringValue(key)
+    override suspend fun hideAskComment(key: String): Boolean = getBooleanValue(key, false)!!
 
 
     // Getter and setter open app counter

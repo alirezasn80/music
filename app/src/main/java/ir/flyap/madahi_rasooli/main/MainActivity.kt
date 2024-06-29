@@ -1,5 +1,7 @@
 package ir.flyap.madahi_rasooli.main
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -29,6 +31,14 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, true)
         LocaleUtils.updateResources(this)
+
+        if (intent.hasExtra("url")) {
+            val url = intent.getStringExtra("url")
+            val i = Intent(Intent.ACTION_VIEW)
+            i.setData(Uri.parse(url))
+            startActivity(i)
+        }
+
         setContent {
             val navigationState = rememberNavigationState()
             mediaViewModel = hiltViewModel()

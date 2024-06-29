@@ -30,7 +30,17 @@ sealed class Progress {
     object Idle : Progress()
 
 }
+
 object LoadingKey {
     const val DEFAULT = "Default"
     const val NEXT_PAGE = "Next Page"
+}
+
+object Reload {
+    var showComment = false
+        get() {
+            val current = field
+            showComment = false
+            return current
+        }
 }

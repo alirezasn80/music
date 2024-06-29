@@ -39,10 +39,10 @@ class HomeViewModel @Inject constructor(
     init {
         checkUpdate()
         openAppCounter()
-        getCommentStatus()
+        statusCanAskComment()
         if (isOnline(context))
             getFans()
-        else{
+        else {
             debug("not online")
         }
     }
@@ -91,18 +91,18 @@ class HomeViewModel @Inject constructor(
 
     }
 
-    private fun getCommentStatus() {
+    private fun statusCanAskComment() {
         viewModelScope.launch {
-            val commentStatus = dataStore.getCommentStatus(Key.COMMENT)
-            state.update { it.copy(showComment = commentStatus == null) }
+            val hideAskComment = dataStore.hideAskComment(Key.COMMENT)
+            state.update { it.copy(showComment = !hideAskComment) }
         }
     }
 
     fun hideNeedUpdate() = state.update { it.copy(needUpdate = false) }
 
-    fun hideCommentItem(status: String) {
+    fun hideAskComment() {
         viewModelScope.launch {
-            dataStore.setCommentStatus(Key.COMMENT, status)
+            dataStore.setHideAskComment(Key.COMMENT, true)
             state.update { it.copy(showComment = false) }
         }
     }

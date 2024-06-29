@@ -25,6 +25,7 @@ import ir.flyap.madahi_rasooli.ui.theme.ExtraSmallSpacer
 import ir.flyap.madahi_rasooli.ui.theme.MediumSpacer
 import ir.flyap.madahi_rasooli.ui.theme.SmallSpacer
 import ir.flyap.madahi_rasooli.ui.theme.dimension
+import ir.flyap.madahi_rasooli.utill.Reload
 import ir.flyap.madahi_rasooli.utill.openBrowser
 
 @Composable

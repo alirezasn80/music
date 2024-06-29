@@ -1,6 +1,7 @@
 package ir.flyap.madahi_rasooli.feature.about_singer
 
 import SliderImage
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -25,9 +26,16 @@ import ir.flyap.madahi_rasooli.ui.theme.MediumSpacer
 import ir.flyap.madahi_rasooli.ui.theme.SmallSpacer
 import ir.flyap.madahi_rasooli.ui.theme.dimension
 import ir.flyap.madahi_rasooli.R
+import ir.flyap.madahi_rasooli.utill.Reload
 
 @Composable
 fun AboutSingerScreen(upPress: () -> Unit) {
+
+    BackHandler {
+        Reload.showComment = true
+        upPress()
+    }
+
     Column(
         Modifier
             .fillMaxSize()
@@ -43,7 +51,10 @@ fun AboutSingerScreen(upPress: () -> Unit) {
             Icon(
                 imageVector = Icons.Rounded.ArrowForward,
                 contentDescription = null,
-                modifier = Modifier.clickable { upPress() },
+                modifier = Modifier.clickable {
+                    Reload.showComment = true
+                    upPress()
+                },
                 tint = MaterialTheme.colorScheme.onBackground
             )
             SmallSpacer()

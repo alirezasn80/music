@@ -11,14 +11,14 @@ interface DataStore {
         key: String,
     ): Boolean
 
-    suspend fun setCommentStatus(
+    suspend fun setHideAskComment(
         key: String,
-        value: String,
+        value: Boolean,
     )
 
-    suspend fun getCommentStatus(
+    suspend fun hideAskComment(
         key: String,
-    ): String?
+    ): Boolean
 
 
     suspend fun setOpenAppCounter(

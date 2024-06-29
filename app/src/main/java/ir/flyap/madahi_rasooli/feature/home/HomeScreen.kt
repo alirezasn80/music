@@ -38,6 +38,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -74,7 +75,6 @@ import ir.flyap.madahi_rasooli.main.navigation.NavigationState
 import ir.flyap.madahi_rasooli.media.MediaViewModel
 import ir.flyap.madahi_rasooli.model.Music
 import ir.flyap.madahi_rasooli.ui.common.BaseTextButton
-import ir.flyap.madahi_rasooli.ui.theme.ExitRed
 import ir.flyap.madahi_rasooli.ui.theme.ExtraSmallSpacer
 import ir.flyap.madahi_rasooli.ui.theme.LargeSpacer
 import ir.flyap.madahi_rasooli.ui.theme.MediumSpacer
@@ -83,7 +83,7 @@ import ir.flyap.madahi_rasooli.ui.theme.Red20
 import ir.flyap.madahi_rasooli.ui.theme.SmallSpacer
 import ir.flyap.madahi_rasooli.ui.theme.dimension
 import ir.flyap.madahi_rasooli.utill.CoilImage
-import ir.flyap.madahi_rasooli.utill.Key
+import ir.flyap.madahi_rasooli.utill.Reload
 import ir.flyap.madahi_rasooli.utill.createImageBitmap
 import ir.flyap.madahi_rasooli.utill.debug
 import ir.flyap.madahi_rasooli.utill.openBazaarComment
@@ -92,7 +92,6 @@ import ir.flyap.madahi_rasooli.utill.shareFile
 import ir.flyap.madahi_rasooli.utill.shareText
 import ir.flyap.madahi_rasooli.utill.showToast
 import kotlinx.coroutines.launch
-import kotlin.system.exitProcess
 
 @Composable
 fun HomeScreen(
@@ -102,7 +101,7 @@ fun HomeScreen(
 ) {
     val mediaState by mediaViewModel.state.collectAsStateWithLifecycle()
     val homeState by homeViewModel.state.collectAsStateWithLifecycle()
-    var reqToExit by remember { mutableStateOf(false) }
+    // var reqToExit by remember { mutableStateOf(false) }
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
@@ -112,6 +111,20 @@ fun HomeScreen(
         onGranted = {},
         onDenied = {}
     )
+
+    // Comment Filter
+    LaunchedEffect(key1 = homeState.openAppCount) {
+
+        if (Reload.showComment && homeState.showComment) {
+            homeViewModel.setDialogKey(HomeDialogKey.AskRate)
+        }
+
+        if (homeState.openAppCount >= 3 && homeState.showComment) {
+            homeViewModel.resetOpenAppCounter()
+            homeViewModel.setDialogKey(HomeDialogKey.AskRate)
+        }
+
+    }
 
 
     // Check Notification Permission
@@ -129,24 +142,22 @@ fun HomeScreen(
         HomeDialogKey.AskRate -> {
             homeViewModel.resetOpenAppCounter()
             AskRateDialog(
-                reqToExit = reqToExit,
+                //  reqToExit = reqToExit,
                 onDismissRequest = {
-                    reqToExit = false
+                    //    reqToExit = false
                     homeViewModel.setDialogKey(HomeDialogKey.Hide)
                 },
                 onYesClick = {
                     homeViewModel.setDialogKey(HomeDialogKey.Hide)
-                    homeViewModel.hideCommentItem(Key.POSITIVE)
+                    homeViewModel.hideAskComment()
                     context.showToast(R.string.support_by_5_star)
                     context.openBazaarComment()
                 },
                 onNoClick = {
                     homeViewModel.setDialogKey(HomeDialogKey.BadRate)
-                    homeViewModel.hideCommentItem(Key.NEGATIVE)
+                    homeViewModel.hideAskComment()
                 },
-                onExitClick = {
-                    exitProcess(0)
-                }
+                // onExitClick = { exitProcess(0) }
             )
         }
 
@@ -211,6 +222,7 @@ fun HomeScreen(
                     label = R.string.about_singer,
                     icon = ImageVector.vectorResource(R.drawable.ic_about_singer),
                     onClick = {
+                        scope.launch { drawerState.close() }
                         navigationState.navToAboutSinger()
                     }
                 )
@@ -219,6 +231,7 @@ fun HomeScreen(
                     label = R.string.about_us,
                     icon = ImageVector.vectorResource(R.drawable.ic_about),
                     onClick = {
+                        scope.launch { drawerState.close() }
                         navigationState.navToAboutUs()
                     }
                 )
@@ -721,11 +734,11 @@ private fun DrawerItem(
 
 @Composable
 private fun AskRateDialog(
-    reqToExit: Boolean,
+    //reqToExit: Boolean,
     onDismissRequest: () -> Unit,
     onYesClick: () -> Unit,
     onNoClick: () -> Unit,
-    onExitClick: () -> Unit,
+    // onExitClick: () -> Unit,
 ) {
     Dialog(onDismissRequest = onDismissRequest) {
         Column(
@@ -758,14 +771,14 @@ private fun AskRateDialog(
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
 
 
-                if (reqToExit) {
-                    BaseTextButton(
-                        text = R.string.exit,
-                        contentColor = ExitRed,
-                        onclick = onExitClick
-                    )
-                } else
-                    MediumSpacer()
+                /* if (reqToExit) {
+                     BaseTextButton(
+                         text = R.string.exit,
+                         contentColor = ExitRed,
+                         onclick = onExitClick
+                     )
+                 } else*/
+                MediumSpacer()
 
 
 
@@ -819,7 +832,8 @@ private fun BadRateDialog(
 
             TextField(
                 value = text,
-                onValueChange = { text = it }
+                onValueChange = { text = it },
+                textStyle = MaterialTheme.typography.bodyLarge.copy(color = Color.Black)
             )
 
             LargeSpacer()
