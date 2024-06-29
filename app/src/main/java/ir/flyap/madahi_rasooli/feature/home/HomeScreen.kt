@@ -219,7 +219,7 @@ fun HomeScreen(
                 )
 
                 DrawerItem(
-                    label = R.string.about_singer,
+                    label = R.string.about_madah,
                     icon = ImageVector.vectorResource(R.drawable.ic_about_singer),
                     onClick = {
                         scope.launch { drawerState.close() }
