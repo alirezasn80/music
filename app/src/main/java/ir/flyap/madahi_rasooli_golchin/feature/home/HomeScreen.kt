@@ -373,7 +373,7 @@ fun HeaderDrawer() {
                 .size(75.dp)
         )
         SmallSpacer()
-        Text(text = stringResource(id = R.string.drawer_desc), color = MaterialTheme.colorScheme.onPrimary)
+        Text(text = stringResource(id = R.string.app_name), color = MaterialTheme.colorScheme.onPrimary)
     }
 }
 
