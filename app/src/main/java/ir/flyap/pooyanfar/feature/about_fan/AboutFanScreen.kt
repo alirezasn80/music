@@ -32,12 +32,12 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.annotation.ExperimentalCoilApi
+import ir.flyap.pooyanfar.R
 import ir.flyap.pooyanfar.ui.theme.MediumSpacer
 import ir.flyap.pooyanfar.ui.theme.SmallSpacer
 import ir.flyap.pooyanfar.ui.theme.dimension
 import ir.flyap.pooyanfar.utill.CoilImage
 import ir.flyap.pooyanfar.utill.openBrowser
-import ir.flyap.pooyanfar.R
 
 @OptIn(ExperimentalCoilApi::class)
 @Composable

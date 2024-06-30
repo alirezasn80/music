@@ -18,11 +18,11 @@ appmetrica {
 }
 
 android {
-    namespace = "ir.flyap.banifatemeh"
+    namespace = "ir.flyap.pooyanfar"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "ir.flyap.banifatemeh"
+        applicationId = "ir.flyap.pooyanfar"
         minSdk = 21
         targetSdk = 34
         versionCode = 100

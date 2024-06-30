@@ -159,7 +159,7 @@ fun Context.shareText(textId: Int) {
 fun Context.openBazaarComment() {
     try {
         val intent = Intent(Intent.ACTION_EDIT)
-        intent.setData(Uri.parse("bazaar://details?id=ir.flyap.banifatemeh"))
+        intent.setData(Uri.parse("bazaar://details?id=ir.flyap.pooyanfar"))
         intent.setPackage("com.farsitel.bazaar")
         startActivity(intent)
     } catch (e: Exception) {
