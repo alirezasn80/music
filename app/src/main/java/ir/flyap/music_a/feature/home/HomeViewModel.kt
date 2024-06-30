@@ -111,7 +111,7 @@ class HomeViewModel @Inject constructor(
 
                 // cover, title,music,lyrics
 
-                itemCrawl(urls,artist)
+                itemCrawl(urls, artist)
 
 
             } catch (e: Exception) {
@@ -310,8 +310,8 @@ class HomeViewModel @Inject constructor(
                     db.musicDao.insertMusic(
                         MusicEntity(
                             id = index + 1,
-                            musicPath = "musics/${index + 1}.jpg",
-                            imagePath = "images/${index + 1}.mp3",
+                            musicPath = "musics/${index + 1}.mp3",
+                            imagePath = "images/${index + 1}.jpg",
                             title = item.title ?: "",
                             lyrics = item.lyrics ?: "",
                             album = ""
