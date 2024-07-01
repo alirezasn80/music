@@ -51,7 +51,7 @@ class HomeViewModel @Inject constructor(
         val lyrics: String?
     )
 
-    fun mainCrawl(artist: String) {
+    fun mainCrawl(artist: String, maxPage: Int) {
         myMusics = mutableListOf<MyMusic>()
         var page = 0
         val urls = mutableListOf<String>()
@@ -71,7 +71,13 @@ class HomeViewModel @Inject constructor(
 
                 while (true) {
                     page += 1
-                    val url = "https://music-fa.com/artists/$artist/page/$page"
+
+                    if (page > maxPage) {
+                        break
+                    }
+
+                   // val url = "https://music-fa.com/artists/$artist/page/$page"
+                    val url = "https://music-fa.com/$artist/page/$page"
                     debug(url)
 
                     val document = connectUrl(url) ?: break

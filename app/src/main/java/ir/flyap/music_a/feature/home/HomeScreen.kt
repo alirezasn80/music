@@ -13,7 +13,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
@@ -28,12 +30,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ir.flyap.music_a.ui.theme.ExtraSmallSpacer
+import ir.flyap.music_a.ui.theme.MediumSpacer
 import ir.flyap.music_a.ui.theme.SmallSpacer
 import ir.flyap.music_a.ui.theme.dimension
 import ir.flyap.music_a.utill.rememberPermissionState
@@ -62,12 +67,33 @@ fun HomeScreen(
     Scaffold(
         topBar = {
             var artist by remember { mutableStateOf("") }
-            Column (modifier = Modifier.padding(dimension.medium)){
-                TextField(
-                    value = artist,
-                    onValueChange = { artist = it },
-                    modifier = Modifier.fillMaxWidth()
-                )
+            var maxPage by remember { mutableStateOf("9999") }
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(dimension.medium)
+            ) {
+                Row(Modifier.fillMaxWidth()) {
+                    TextField(
+                        value = artist,
+                        onValueChange = { artist = it },
+                        modifier = Modifier.weight(1f),
+                        placeholder = { Text(text = "artist") },
+                        textStyle = MaterialTheme.typography.bodyLarge.copy(color = Color.Black)
+
+                    )
+                    SmallSpacer()
+                    TextField(
+                        value = maxPage,
+                        onValueChange = { maxPage = it },
+                        modifier = Modifier.width(100.dp),
+                        placeholder = { Text(text = "page") },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        textStyle = MaterialTheme.typography.bodyLarge.copy(color = Color.Black)
+                    )
+                }
+
+
                 Row(
                     Modifier
                         .fillMaxWidth()
@@ -75,7 +101,7 @@ fun HomeScreen(
                 ) {
                     SmallSpacer()
                     Button(
-                        onClick = { homeViewModel.mainCrawl(artist) },
+                        onClick = { homeViewModel.mainCrawl(artist,maxPage.toInt()) },
                         modifier = Modifier.weight(1f)
                     ) {
                         Text(text = "Crawl")
