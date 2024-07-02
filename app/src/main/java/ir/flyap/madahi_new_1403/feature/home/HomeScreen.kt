@@ -367,7 +367,7 @@ fun HeaderDrawer() {
     ) {
         Image(
             painter = painterResource(
-                id = R.drawable.img_logo
+                id = R.mipmap.ic_launcher_foreground
             ),
             contentDescription = null,
             modifier = Modifier

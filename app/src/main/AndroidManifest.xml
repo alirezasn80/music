@@ -57,7 +57,7 @@
             android:name="ir.flyap.madahi_new_1403.service.MediaPlayerService"
             android:exported="false"
             android:foregroundServiceType="mediaPlayback"
-            android:icon="@drawable/img_logo">
+            android:icon="@drawable/ic_music">
             <intent-filter>
                 <action android:name="android.media.browser.MediaBrowserService" />
             </intent-filter>
@@ -65,7 +65,7 @@
 
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
-            android:resource="@drawable/img_logo" />
+            android:resource="@drawable/ic_music" />
     </application>
 
 </manifest>

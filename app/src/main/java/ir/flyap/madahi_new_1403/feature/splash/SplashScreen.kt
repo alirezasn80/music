@@ -39,7 +39,7 @@ fun SplashScreen(navigationState: NavigationState, viewModel: SplashViewModel = 
         contentAlignment = Alignment.Center
     ) {
         Image(
-            painter = painterResource(id = R.drawable.img_logo),
+            painter = painterResource(id = R.mipmap.ic_launcher_foreground),
             contentDescription = null,
             modifier = Modifier.clip(CircleShape).size(200.dp)
         )
