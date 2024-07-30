@@ -18,11 +18,11 @@ appmetrica {
 }
 
 android {
-    namespace = "ir.flyap.madahi_golchin"
+    namespace = "ir.flyap.chavoshi"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "ir.flyap.madahi_golchin"
+        applicationId = "ir.flyap.chavoshi"
         minSdk = 21
         targetSdk = 34
         versionCode = 100
