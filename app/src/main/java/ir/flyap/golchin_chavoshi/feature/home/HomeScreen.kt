@@ -295,9 +295,7 @@ fun HomeScreen(
                         if (mediaState.musics.isNotEmpty())
                             mediaViewModel.playAudio(mediaState.musics[0])
                     })
-                StandardAd(
-                    onUpdate = homeViewModel::updateStandardBannerContainer
-                )
+                StandardAd(onUpdate = homeViewModel::updateStandardBannerContainer)
                 SmallSpacer()
 
                 if (mediaState.isLoading) {
